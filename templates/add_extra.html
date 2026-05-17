@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Extra Expense</title>
+    <link rel="stylesheet" href="/static/global.css">
+</head>
+
+<body class="forecast-page">
+
+<h1 class="page-title">➕ Add Extra Expense</h1>
+
+<div style="margin-bottom: 20px;">
+    <a href="/forecast" class="pro-btn">← Back to Forecast</a>
+</div>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-container">
+            {% for category, msg in messages %}
+                <div class="flash flash-{{ category }}">{{ msg }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<!-- Centered Card Wrapper -->
+<div class="extra-card-wrapper">
+    <div class="extra-card">
+
+        <form method="POST">
+
+            <!-- DATE -->
+            <div class="form-row">
+                <label>Date</label>
+                <input type="date" name="date" required>
+            </div>
+
+            <!-- AMOUNT -->
+            <div class="form-row">
+                <label>Amount ($)</label>
+                <input type="number" name="amount" step="0.01" required placeholder="0.00">
+            </div>
+
+            <!-- ⭐ NEW FIELD: TYPE (Deposit or Expense) -->
+            <div class="form-row">
+                <label>Type</label>
+                <select name="type" required>
+                    <option value="expense">Expense (subtract)</option>
+                    <option value="deposit">Deposit (add)</option>
+                </select>
+            </div>
+
+            <!-- NOTE -->
+            <div class="form-row">
+                <label>Note (optional)</label>
+                <input type="text" name="note" placeholder="Gas, food, shopping…">
+            </div>
+
+            <!-- SUBMIT -->
+            <button type="submit" class="pro-btn full-width">Save Expense</button>
+
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>

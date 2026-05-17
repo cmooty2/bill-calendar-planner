@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Occurrence</title>
+    <link rel="stylesheet" href="/static/global.css">
+</head>
+
+<body>
+
+<h1 class="page-title">✏️ Edit Occurrence</h1>
+
+<div class="form-container">
+
+<form method="POST">
+
+    <div class="form-row">
+        <div class="form-field">
+            <label>Bill</label>
+            <input type="text" value="{{ occ.bill.name }}" disabled>
+        </div>
+
+        <div class="form-field">
+            <label>Amount</label>
+            <input type="text" value="${{ '%.2f'|format(occ.bill.amount) }}" disabled>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-field">
+            <label>Due Date</label>
+            <input type="date" name="due_date" value="{{ occ.due_date }}">
+        </div>
+
+        <div class="form-field">
+            <label>Status</label>
+            <select name="status">
+                <option value="Unpaid" {% if occ.status=='Unpaid' %}selected{% endif %}>Unpaid</option>
+                <option value="Paid" {% if occ.status=='Paid' %}selected{% endif %}>Paid</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-field-large">
+        <label>Notes</label>
+        <textarea name="notes" rows="4">{{ occ.notes }}</textarea>
+    </div>
+
+    <div class="form-actions">
+        <button class="pro-btn" type="submit">💾 Save</button>
+        <a class="pro-btn cancel-btn" href="/occurrences">Cancel</a>
+    </div>
+
+</form>
+
+</div>
+
+</body>
+</html>

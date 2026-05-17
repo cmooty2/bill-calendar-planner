@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bill Calendar</title>
+    <link rel="stylesheet" href="/static/global.css">
+</head>
+
+<body>
+
+<!-- ========================== HEADER ============================= -->
+<div class="calendar-sticky-header">
+
+    <h1 class="page-title pro-title">
+        <span class="emoji">📅</span> Monthly Bill Calendar
+    </h1>
+
+    <div class="pro-button-row">
+        <a class="pro-btn" href="/dashboard">🏠 Home</a>
+        <a class="pro-btn" href="/bills">📘 Bills</a>
+        <a class="pro-btn" href="/forecast">📊 Forecast</a>
+
+        <details class="nav-more">
+            <summary class="pro-btn">⋯ More</summary>
+            <div class="nav-more-panel">
+            <a href="/paycheck-planner">🧾 Paycheck Planner</a>
+            <a href="/all_occurrences">📄 All Occurrences</a>
+            <a href="/add-extra">➕ Add Extra Expense</a>
+            <a href="/extras">📋 Extras List</a>
+            </div>
+        </details>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-container">
+            {% for category, msg in messages %}
+                <div class="flash {{ category }}">{{ msg|safe }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Month Navigation -->
+    <div class="month-nav">
+        <a class="nav-btn"
+           href="/calendar/{{ year if month > 1 else year-1 }}/{{ month-1 if month > 1 else 12 }}">
+            ⬅ Prev
+        </a>
+
+        <span class="month-title">
+            {{ date(year, month, 1).strftime("%B %Y") }}
+        </span>
+
+        <a class="nav-btn"
+           href="/calendar/{{ year if month < 12 else year+1 }}/{{ month+1 if month < 12 else 1 }}">
+            Next ➡
+        </a>
+    </div>
+
+    <!-- Heat Map Toggle -->
+    <div class="heat-toggle-wrapper">
+        <label class="switch">
+            <input type="checkbox" id="heatToggle" checked>
+            <span class="slider round"></span>
+        </label>
+        <span class="heat-label">Heat Map</span>
+    </div>
+
+    <!-- ============= CATEGORY LEGEND BAR (PRO) ============= -->
+    <div class="category-legend">
+        <div><span class="legend-pill cat-rent"></span> Rent/Mortgage</div>
+        <div><span class="legend-pill cat-utilities"></span> Utilities</div>
+        <div><span class="legend-pill cat-home"></span> Home Expenses</div>
+        <div><span class="legend-pill cat-credit"></span> Credit Cards</div>
+        <div><span class="legend-pill cat-loans"></span> Loans</div>
+        <div><span class="legend-pill cat-auto"></span> Auto Services</div>
+        <div><span class="legend-pill cat-subs"></span> Subscriptions</div>
+        <div><span class="legend-pill cat-ins"></span> Insurance</div>
+        <div><span class="legend-pill cat-misc"></span> Misc</div>
+    </div>
+
+</div>
+
+<!-- ========================== CALENDAR WRAPPER ============================= -->
+<div class="calendar-wrapper">
+
+    <!-- Weekday Labels -->
+    <div class="calendar-weekdays">
+        <div>Sun</div><div>Mon</div><div>Tue</div>
+        <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+
+    <!-- GRID START -->
+    <div class="calendar-grid">
+
+        {% for week in month_matrix %}
+
+            <!-- ====================== DAY CELLS ======================= -->
+            {% for day in week %}
+
+                {% if day == 0 %}
+                    <div class="calendar-day empty"></div>
+                {% else %}
+
+                    {% set this_date = date(year, month, day) %}
+                    {% set is_today = (this_date == today) %}
+                    {% set in_paycheck_window = paycheck_start <= this_date <= paycheck_end %}
+
+                    {% set bill_count = calendar_days[day] | length if day in calendar_days else 0 %}
+                    {% set heat_class = "" %}
+                    {% if bill_count >= 5 %}
+                        {% set heat_class = "heat-4" %}
+                    {% elif bill_count == 4 %}
+                        {% set heat_class = "heat-3" %}
+                    {% elif bill_count == 3 %}
+                        {% set heat_class = "heat-2" %}
+                    {% elif bill_count >= 1 %}
+                        {% set heat_class = "heat-1" %}
+                    {% endif %}
+
+                    <div class="calendar-day {{ heat_class }}
+                        {% if is_today %} today {% endif %}
+                        {% if in_paycheck_window %} paycheck-window {% endif %}
+                    ">
+
+                        <div class="day-number">
+                            {% if is_today %}
+                                <div class="today-banner">Today</div>
+                            {% endif %}
+                            {{ day }}
+                        </div>
+
+                        {% for p in paydays_in_month %}
+                            {% if p.day == day %}
+                                <div class="payday-pill">💰 Payday</div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if day in calendar_days %}
+                            {% for occ in calendar_days[day] %}
+                                <div class="
+                                    bill-pill bill-clickable
+                                    {% if occ.status == 'Paid' %} bill-paid {% else %} bill-unpaid {% endif %}
+                                    {% if occ.bill.category == 'Rent/Mortgage' %} cat-rent
+                                    {% elif occ.bill.category == 'Utilities' %} cat-utilities
+                                    {% elif occ.bill.category == 'Home Expenses' %} cat-home
+                                    {% elif occ.bill.category == 'Credit Cards' %} cat-credit
+                                    {% elif occ.bill.category == 'Loans' or occ.bill.category == 'Installment Loans' %} cat-loans
+                                    {% elif occ.bill.category == 'Auto Services' %} cat-auto
+                                    {% elif occ.bill.category == 'Subscriptions' %} cat-subs
+                                    {% elif occ.bill.category == 'Insurance' %} cat-ins
+                                    {% else %} cat-misc
+                                    {% endif %}
+                                "
+                                     data-name="{{ occ.bill.name }}"
+                                     data-amount="{{ '%.2f'|format(occ.bill.amount) }}"
+                                     data-category="{{ occ.bill.category }}"
+                                     data-status="{{ occ.status }}"
+                                     data-duedate="{{ occ.due_date.strftime('%m-%d-%Y') }}"
+                                >
+
+                                    <span class="pill-icon">
+                                        {{ category_icons.get(occ.bill.category, "🧾") }}
+                                    </span>
+
+                                    <span class="pill-text">
+                                        {{ occ.bill.name }} – ${{ '%.2f'|format(occ.bill.amount) }}
+                                    </span>
+
+                                    {% if occ.status != "Paid" %}
+                                        <a href="/mark-paid/{{ occ.id }}" class="calendar-mark-btn"> 🔔 </a>
+                                    {% else %}
+                                        <span class="paid-check">✔</span>
+                                    {% endif %}
+
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <!-- ====================== WEEKLY TOTAL BAR (USING NAMESPACE) ======================= -->
+            {% set ns = namespace(total=0) %}
+
+            {% for d in week %}
+                {% if d != 0 %}
+                    {% set d_int = d|int %}
+                    {% if d_int in calendar_days %}
+                        {% for occ in calendar_days[d_int] %}
+                            {% set ns.total = ns.total + occ.bill.amount %}
+                        {% endfor %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            <div class="week-total-row">
+                Weekly Total: ${{ '%.2f'|format(ns.total) }}
+            </div>
+
+        {% endfor %}
+
+    </div> <!-- END .calendar-grid -->
+
+</div> <!-- END .calendar-wrapper -->
+
+<!-- ========================== BILL DETAILS MODAL ============================= -->
+<div id="billModal" class="modal hidden">
+    <div class="modal-content">
+        <span id="closeModal" class="modal-close">&times;</span>
+
+        <h2 id="modalName"></h2>
+        <p><strong>Amount:</strong> $<span id="modalAmount"></span></p>
+        <p><strong>Category:</strong> <span id="modalCategory"></span></p>
+        <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+        <p><strong>Due Date:</strong> <span id="modalDueDate"></span></p>
+    </div>
+</div>
+
+<!-- ========================== JAVASCRIPT ============================= -->
+<script>
+/* Fade out flash messages */
+setTimeout(() => {
+    const flash = document.querySelector(".flash-container");
+    if (flash) {
+        flash.style.opacity = "0";
+        setTimeout(() => flash.remove(), 500);
+    }
+}, 2500);
+
+/* Modal Logic */
+const modal = document.getElementById("billModal");
+const closeModal = document.getElementById("closeModal");
+
+document.querySelectorAll(".bill-clickable").forEach(bill => {
+    bill.addEventListener("click", () => {
+        document.getElementById("modalName").textContent = bill.dataset.name;
+        document.getElementById("modalAmount").textContent = bill.dataset.amount;
+        document.getElementById("modalCategory").textContent = bill.dataset.category;
+        document.getElementById("modalStatus").textContent = bill.dataset.status;
+        document.getElementById("modalDueDate").textContent = bill.dataset.duedate;
+        modal.classList.remove("hidden");
+    });
+});
+
+closeModal.addEventListener("click", () => modal.classList.add("hidden"));
+modal.addEventListener("click", e => { if (e.target === modal) modal.classList.add("hidden"); });
+
+/* Heat Toggle */
+const heatToggle = document.getElementById("heatToggle");
+const wrapper = document.querySelector(".calendar-wrapper");
+
+heatToggle.addEventListener("change", () => {
+    if (!heatToggle.checked) wrapper.classList.remove("heat-on");
+    else wrapper.classList.add("heat-on");
+
+    document.querySelectorAll(".calendar-day").forEach(day => {
+        if (!heatToggle.checked) {
+            day.dataset.originalClass = day.className;
+            day.classList.remove("heat-1","heat-2","heat-3","heat-4");
+        } else if (day.dataset.originalClass) {
+            day.className = day.dataset.originalClass;
+        }
+    });
+});
+
+wrapper.classList.add("heat-on");
+</script>
+
+</body>
+</html>

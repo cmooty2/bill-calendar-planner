@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Extra Expenses & Deposits</title>
+    <link rel="stylesheet" href="/static/global.css">
+</head>
+
+<body class="forecast-page">
+
+<h1 class="page-title">➕ Extra Expenses & Deposits</h1>
+
+<!-- Navigation Buttons -->
+<div class="pro-button-row">
+    <a href="/dashboard" class="pro-btn">🏠 Home</a>
+    <a href="/forecast" class="pro-btn">📊 Forecast</a>
+    <a href="/add-extra" class="pro-btn">➕ Add Extra</a>
+</div>
+
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, msg in messages %}
+        <div class="flash flash-{{ category }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- Table of Extras -->
+<table class="pro-table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Note</th>
+            <th style="text-align:center;">Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for e in extras %}
+        <tr>
+
+            <!-- Date -->
+            <td>{{ e.date.strftime("%b %d, %Y") }}</td>
+
+            <!-- Deposit or Expense Label (based on e.type, not amount) -->
+            <td>
+                <span class="{% if e.type == 'deposit' %}extra-deposit{% else %}extra-expense{% endif %}">
+                    {{ e.type|capitalize }}
+                </span>
+                
+            </td>
+
+            <!-- Amount (color-coded) -->
+            <td class="{% if e.amount > 0 %}amount-positive{% else %}amount-negative{% endif %}">
+                ${{ "%.2f"|format(e.amount) }}
+            </td>
+
+            <!-- Note -->
+            <td>{{ e.note }}</td>
+
+            <!-- Actions -->
+            <td style="text-align:center; white-space:nowrap;">
+                <a class="small-link" href="/extras/edit/{{ e.id }}" style="margin-right:8px;">Edit</a>
+                <a class="small-link danger" href="/extras/delete/{{ e.id }}"
+                   onclick="return confirm('Delete this entry?');">Delete</a>
+            </td>
+
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

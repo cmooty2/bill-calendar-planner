@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Extra</title>
+    <link rel="stylesheet" href="/static/global.css">
+</head>
+
+<body class="forecast-page">
+
+<h1 class="page-title">✏️ Edit Extra Entry</h1>
+
+<div style="margin-bottom: 20px;">
+    <a href="/extras" class="pro-btn">← Back to Extras List</a>
+</div>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-container">
+            {% for category, msg in messages %}
+                <div class="flash flash-{{ category }}">{{ msg }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<div class="extra-card-wrapper">
+    <div class="extra-card">
+
+        <form method="POST">
+
+            <!-- DATE -->
+            <div class="form-row">
+                <label>Date</label>
+                <input type="date" name="date"
+                       value="{{ extra.date.strftime('%Y-%m-%d') }}"
+                       required>
+            </div>
+
+            <!-- AMOUNT -->
+            <div class="form-row">
+                <label>Amount ($)</label>
+                <input type="number" name="amount" step="0.01" required
+                       value="{{ '%.2f'|format(extra.amount|abs) }}">
+            </div>
+
+            <!-- TYPE (Expense or Deposit) -->
+            <div class="form-row">
+                <label>Type</label>
+                <select name="type" required>
+
+                    <option value="expense"
+                        {% if extra.type == 'expense' %}selected{% endif %}>
+                        Expense (subtract)
+                    </option>
+
+                    <option value="deposit"
+                        {% if extra.type == 'deposit' %}selected{% endif %}>
+                        Deposit (add)
+                    </option>
+
+                </select>
+            </div>
+
+            <!-- NOTE -->
+            <div class="form-row">
+                <label>Note (optional)</label>
+                <input type="text" name="note" value="{{ extra.note }}">
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <button type="submit" class="pro-btn full-width">Save Changes</button>
+
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>

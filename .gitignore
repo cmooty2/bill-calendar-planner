@@ -1,0 +1,28 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Flask / local config
+.env
+instance/
+bills.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Mac
+.DS_Store
+
+# VS Code
+.vscode/

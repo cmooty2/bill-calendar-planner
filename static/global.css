@@ -1,0 +1,3843 @@
+/* ================================================================= */
+/*                     GLOBAL RESET & BASE STYLES                    */
+/* ================================================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+body {
+    background: #F7F8FA;
+    padding: 20px 40px;
+    color: #333;
+}
+
+/* Page Title */
+.page-title {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #3D52A0;
+}
+
+/* Emoji Title Icon */
+.page-title .emoji {
+    margin-right: 6px;
+}
+
+/* ================================================================= */
+/*                      PRO BUTTONS & CONTROLS                       */
+/* ================================================================= */
+.pro-button-row{
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+
+    /* sticky nav */
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: #F7F8FA;
+    padding: 10px 0;
+}
+
+
+.pro-btn {
+    background: #3D52A0;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+
+    /* ✅ Make all buttons the same height */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    line-height: 1;
+    white-space: nowrap;
+    min-height: 42px;
+
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+    
+    flex: 0 0 auto;
+
+}
+
+
+.pro-btn:hover {
+    background: #2E3E7A;
+}
+
+.cancel-btn {
+    background: #aaa !important;
+}
+
+.cancel-btn:hover {
+    background: #888 !important;
+}
+
+/* ================================================================= */
+/*                       DASHBOARD – LAYOUT                          */
+/* ================================================================= */
+
+/* 2-COLUMN PRO DASHBOARD LAYOUT */
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+}
+
+
+/* RIGHT-SIDE PAYCHECK SIDEBAR */
+.right-panel-wrapper {
+    grid-column: 2 / 3;
+    z-index: 2;
+    position: relative;
+}
+
+
+
+.next-payday-banner {
+    background: #3D52A0;
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    font-size: 15px;
+    text-align: center;
+}
+
+/* Accordion */
+.accordion-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: #f5f6fb;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.accordion-header:hover {
+    background: #eceef8;
+}
+
+.accordion-header.open {
+    background: #e2e5f5;
+}
+
+/* ============================================================= */
+/*    PAYCHECK PLANNER – SPACING + INDENT FIXES                  */
+/* ============================================================= */
+
+/* Indent contents inside accordion */
+.paycheck-card-standalone,
+.paycheck-info,
+.paycheck-update-form {
+    margin-left: 22px;   /* indent content */
+}
+
+/* Add spacing under the paycheck amount input box */
+.paycheck-update-form .input-wrapper {
+    margin-bottom: 12px; /* spacing before Save button */
+}
+
+/* Improve spacing of paycheck form overall */
+.paycheck-update-form input,
+.paycheck-update-form select {
+    margin-bottom: 8px;
+}
+
+/* Inner text indent for paragraphs only */
+.paycheck-info p {
+    margin-left: 8px;  /* small indent relative to parent */
+}
+
+/* Keep update form aligned with card but not double-indented */
+.paycheck-update-form {
+    margin-left: 22px;
+}
+
+/* ================================
+   PAYCHECK PLANNER SPACING PATCH
+================================ */
+
+/* Pull Remaining label closer to the other labels */
+.remaining-label {
+    margin-top: 2px;
+    margin-bottom: 6px;
+}
+
+/* Adjust the $ prefix alignment */
+.paycheck-update-form .input-wrapper {
+    align-items: center;
+    gap: 8px !important;            /* small spacing between $ and the box */
+}
+
+/* Make input taller and more visually balanced */
+.paycheck-update-form .paycheck-input {
+    height: 40px !important;        /* increase top-to-bottom size */
+    padding: 8px 10px !important;   /* add breathing room */
+    font-size: 1rem !important;     /* match UI scale */
+}
+
+/* Make the $ prefix slightly bigger for balance */
+.paycheck-update-form .input-wrapper span {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* ============================
+PAYCHECK PLANNER LAYOUT FIX
+============================ */
+
+.paycheck-two-col {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+
+/* Left = Planner */
+.paycheck-left {
+    flex: 1.2;
+    min-width: 300px;
+}
+
+/* Right = Mini Charts */
+.paycheck-right {
+    flex: 1;
+    min-width: 260px;
+    background: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* Make canvases fit neatly */
+.mini-chart {
+    width: 100% !important;
+    max-height: 220px;
+    margin-bottom: 20px;
+}
+
+/* Full-width bar chart under both columns */
+.paycheck-daily-chart {
+    flex-basis: 100%;
+    background: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin-top: 20px;
+}
+
+.paycheck-card-standalone {
+    background: #fff;
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+
+/* =============================== */
+/*   PAYCHECK PLANNER ACCORDION    */
+/* =============================== */
+
+/* Make container expand normally — REMOVE sticky */
+.sidebar-paycheck {
+    position: static !important;     /* allow normal expansion */
+    top: auto !important;            /* remove offset */
+}
+
+
+/* Accordion header */
+.accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: #f5f6fb;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.25s ease;
+}
+
+.accordion-header:hover {
+    background: #eceef8;
+}
+
+.accordion-header.open {
+    background: #e2e5f5;
+}
+
+/* Accordion body (closed by default) */
+#paycheck-accordion {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+}
+
+/* When opened */
+#paycheck-accordion.open {
+    max-height: 3000px; /* VERY safe cap */
+}
+
+.tab-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+PAYCHECK PLANNER - HORIZONTAL LANES
+(restores vertical "columns" across the page)
+============================================================ */
+.paycheck-lane-grid{
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 8px; /* room for scrollbar */
+}
+
+/* Optional: a little nicer on smaller screens */
+@media (max-width: 700px){
+.paycheck-lane-grid .paycheck-lane{
+    flex-basis: 280px;
+    min-width: 280px;
+}
+}
+/* ============================================================
+DASHBOARD
+============================================================ */
+/* Arrow rotation */
+#accordion-arrow {
+    transition: transform 0.25s ease;
+}
+
+.accordion-header.open #accordion-arrow {
+    transform: rotate(180deg);
+}
+
+/* ============================================================
+PAYCHECK PLANNER - Lane Header spacing (date vs amount)
+============================================================ */
+.paycheck-lane-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;              /* ✅ adds breathing room */
+    margin: 0;              /* h3 default margins can be inconsistent */
+    flex-wrap: wrap;
+    padding-top: 2px;
+}
+
+.paycheck-lane-right {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    flex-direction: column;
+    gap: 6px;
+    text-align: right;
+}
+
+.paycheck-lane-title {
+    min-width: 0;           /* ✅ allows wrapping/ellipsis behaviors safely */
+    font-weight: 700;
+}
+
+  /* Paycheck Amount label styling */
+.paycheck-lane-amount-label {
+    font-weight: 600;
+    color: #444;
+    margin-right: 6px;
+    font-size: 1.1rem;
+}
+
+.paycheck-lane-amount {
+    font-size: 0.9rem;
+    color: #666;
+    white-space: nowrap;    /* ✅ prevents $3249.62 from breaking */
+    flex-shrink: 0;         /* ✅ keeps amount readable, not squeezed */
+
+}
+
+/* Paycheck lane bill status badge */
+.lane-bill-meta{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.lane-status-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.lane-status-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    line-height: 1;
+}
+
+.lane-status-paid{
+    background: #ecfdf3;
+    border-color: #abefc6;
+    color: #067647;
+}
+
+.lane-status-unpaid{
+    background: #fff7ed;
+    border-color: #fed7aa;
+    color: #9a3412;
+}
+
+.lane-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+    color: #111827;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.lane-pill-danger {
+    background: #fff1f2;
+    border-color: #fecdd3;
+    color: #9f1239;
+}
+
+.lane-pill-warn {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+  /* Subtle lane “state” styling (no loud borders) */
+.paycheck-lane.lane-negative {
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.14);
+}
+
+.paycheck-lane.lane-nearfull {
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.14);
+}
+
+/* =========================================================
+PAYCHECK PLANNER (page-scoped helpers + clean lane cards)
+- Added to support Paycheck Planner UI without affecting
+    other pages.
+========================================================= */
+
+/* Utility helpers (prefixed) */
+.pp-mb-16 { margin-bottom: 16px; }
+.pp-mb-14 { margin-bottom: 14px; }
+.pp-mt-n6 { margin-top: -6px; }
+.pp-mt-6  { margin-top: 6px; }
+.pp-mt-8  { margin-top: 8px; }
+.pp-mt-10 { margin-top: 10px; }
+.pp-mt-12 { margin-top: 12px; }
+
+.pp-row { display: flex; }
+.pp-col { display: flex; flex-direction: column; }
+.pp-wrap { flex-wrap: wrap; }
+.pp-gap-10 { gap: 10px; }
+.pp-gap-12 { gap: 12px; }
+.pp-ai-center { align-items: center; }
+.pp-ai-end { align-items: flex-end; }
+
+.pp-fw-700 { font-weight: 700; }
+.pp-fw-800 { font-weight: 800; }
+
+.pp-fs-90 { font-size: 0.9rem; }
+.pp-fs-92 { font-size: 0.92rem; }
+
+.pp-muted { color: #666; }
+.pp-bg-white { background: #fff; }
+
+.pp-maxw-280 { max-width: 280px; }
+.pp-minw-0 { min-width: 0; }
+.pp-minw-180 { min-width: 180px; }
+.pp-minw-220 { min-width: 220px; }
+.pp-minw-260 { min-width: 260px; }
+.pp-flex-1 { flex: 1; }
+.pp-w-100 { width: 100%; }
+
+.pp-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pp-right { text-align: right; }
+.pp-shrink-0 { flex-shrink: 0; }
+
+.pp-btn-compact { padding: 6px 10px; margin-top: 6px; }
+
+.pp-my-6-0 { margin: 6px 0; }
+
+.pp-table-fixed { table-layout: fixed; width: 100%; }
+
+
+
+/* =========================================================
+Paycheck Planner - Mortgage Split Helper responsiveness
+========================================================= */
+
+.pp-mortgage-row {
+    align-items: flex-end;            /* labels/selects align nicely */
+}
+
+/* Let the 3 dropdown blocks flex + wrap cleanly */
+    .pp-mortgage-row .pp-minw-260,
+    .pp-mortgage-row .pp-minw-220,
+    .pp-mortgage-row .pp-minw-180 {
+    flex: 1 1 220px;                  /* grow/shrink, wrap when needed */
+    min-width: 200px;                 /* smaller than your current mins */
+}
+
+/* Keep button group from getting pushed off-screen */
+    .pp-mortgage-actions {
+    flex: 0 0 auto;
+    align-items: flex-end;
+}
+
+/* Mobile: stack inputs + make buttons full width */
+    @media (max-width: 720px) {
+    .pp-mortgage-row .pp-minw-260,
+    .pp-mortgage-row .pp-minw-220,
+    .pp-mortgage-row .pp-minw-180 {
+        flex: 1 1 100%;
+        min-width: 100%;
+}
+
+.pp-mortgage-actions {
+    width: 100%;
+}
+
+#btnSplitMortgage,
+#btnUndoMortgageSplit {
+    width: 100%;
+}
+}
+
+.pp-inline-msg{
+    margin-top: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #f6f7fb;
+    border: 1px solid #e6e8f2;
+}
+
+
+/* =========================================================
+PAYCHECK PLANNER - Compact toolbar for snapshot picker
+========================================================= */
+.paycheck-planner-page .pp-toolbar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    background: #f5f6fb;
+    border: 1px solid #e5e7ef;
+    border-radius: 10px;
+}
+
+.paycheck-planner-page .pp-toolbar label{
+    margin: 0;
+    font-weight: 700;
+    color: #2b2f36;
+    font-size: 0.95rem;
+}
+
+.paycheck-planner-page .pp-toolbar select{
+    margin-left: auto;          /* pushes dropdown to the right */
+    max-width: 280px;
+}
+
+/* Mobile: stack neatly */
+@media (max-width: 520px){
+.paycheck-planner-page .pp-toolbar{
+    flex-direction: column;
+    align-items: stretch;
+}
+.paycheck-planner-page .pp-toolbar select{
+    max-width: 100%;
+    margin-left: 0;
+}
+}
+
+/* =========================================================
+PAYCHECK PLANNER - Planner Summary polish
+================================================= */
+
+.paycheck-planner-page .pp-summary-section {
+    margin-top: 8px;
+  }
+  
+  .paycheck-planner-page .pp-summary-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  
+  .paycheck-planner-page .pp-summary-title{
+    margin: 0;
+    line-height: 1.1;
+  }
+  
+  .paycheck-planner-page .pp-summary-toolbar{
+    margin-top: 0;
+    padding: 8px 10px;          /* slightly tighter than default */
+    border-radius: 12px;
+  }
+  
+  .paycheck-planner-page .pp-summary-sub{
+    color: #667085;
+    font-size: 0.95rem;
+    margin: 6px 0 12px;
+  }
+  
+  /* KPI grid spacing */
+  .paycheck-planner-page .pp-summary-grid{
+    gap: 14px;                  /* a little more breathing room */
+  }
+  
+  /* KPI card typography */
+  .paycheck-planner-page .pp-kpi h3{
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #2b2f36;
+  }
+  
+  /* Subtle right-side "amount pill" look */
+  .paycheck-planner-page .pp-kpi-pill{
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: #f5f6fb;
+    border: 1px solid #e5e7ef;
+    color: #111827;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+  }
+  
+  /* Make Remaining stand out when it goes negative (without going loud-red) */
+  .paycheck-planner-page #remainingCard.pp-kpi.pp-neg .pp-kpi-pill{
+    background: #fff7ed;
+    border-color: #fed7aa;
+    color: #7c2d12;
+  }
+  
+  /* Mobile: keep header clean */
+  @media (max-width: 520px){
+    .paycheck-planner-page .pp-summary-head{
+      align-items: stretch;
+    }
+    .paycheck-planner-page .pp-summary-toolbar{
+      width: 100%;
+    }
+  }
+
+  /* =========================================================
+   PAYCHECK PLANNER - KPI icon + helper text under pill
+========================================================= */
+.paycheck-planner-page .pp-kpi-meta{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    color: #667085;            /* muted, pro */
+    font-size: 0.88rem;
+    line-height: 1.2;
+  }
+  
+  .paycheck-planner-page .pp-kpi-icon{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: #f5f6fb;
+    border: 1px solid #e5e7ef;
+    font-size: 0.9rem;
+    flex: 0 0 auto;
+  }
+  
+  .paycheck-planner-page .pp-kpi-help{
+    white-space: nowrap;
+   
+    text-overflow: ellipsis;
+  }
+  
+  /* If Remaining goes negative, gently warm the helper row too */
+  .paycheck-planner-page #remainingCard.pp-neg .pp-kpi-icon{
+    background: #fff7ed;
+    border-color: #fed7aa;
+  }
+  .paycheck-planner-page #remainingCard.pp-neg .pp-kpi-meta{
+    color: #7c2d12;
+  }
+
+
+/* Lane totals row (Assigned / Left) */
+.lane-totals {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #f7f8fc;
+    border: 1px solid #e6e8f2;
+    border-radius: 10px;
+    font-size: 0.92rem;
+}
+
+.lane-totals strong { font-weight: 800; }
+
+/* Lane items area */
+.lane-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Empty state: show only when lane has no bills */
+.lane-empty {
+    display: block;
+    text-align: center;
+    padding: 14px 10px;
+    border: 2px dashed #cfd6ea;
+    border-radius: 12px;
+    background: #fafbff;
+    color: #667085;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* Action buttons wrapper */
+.lane-actions { margin-top: 12px; }
+
+/* Bill cards inside each lane */
+.lane-bill-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+}
+
+
+/* Optional: slightly “dim” paid items so they’re visually different */
+.lane-bill-card.is-paid{
+    opacity: 0.88;
+}
+
+/* Give the unassigned table its own scroll area */
+body.paycheck-planner-page .pp-table-scroll{
+    max-height: 420px;
+    overflow: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow-x: auto;
+}
+
+
+/* =========================================================
+PAYCHECK PLANNER — Bulk Assign Toolbar (Option A)
+========================================================= */
+body.paycheck-planner-page .pp-bulkbar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    background: #f5f6fb;
+    border: 1px solid #e6e8f2;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin: 10px 0 10px;
+}
+
+body.paycheck-planner-page .pp-bulk-left{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+body.paycheck-planner-page .pp-bulk-check{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    color: #111;
+    user-select: none;
+}
+
+body.paycheck-planner-page .pp-bulk-count{
+    font-weight: 800;
+    color: #3D52A0;
+}
+
+body.paycheck-planner-page .pp-bulk-actions{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+body.paycheck-planner-page .pp-bulk-select{
+    width: 280px;
+    max-width: 100%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #d0d5dd;
+    background: #fff;
+    font-weight: 700;
+}
+
+/* Checkbox column */
+body.paycheck-planner-page .pp-checkcell{
+    width: 44px;
+    text-align: center;
+}
+
+body.paycheck-planner-page input.pp-row-check{
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Small utility for screen-reader-only label */
+.pp-sr-only{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+}
+
+
+
+/* ============================================================
+PAYCHECK PLANNER - Affirm Tracker Cards
+============================================================ */
+.affirm-loans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 12px;
+}
+
+.affirm-card {
+    background: #fff;
+    border: 1px solid #e5e7ef;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.affirm-card h3 {
+    margin: 0 0 8px;
+    font-size: 0.98rem;
+}
+
+.affirm-card p {
+    margin: 2px 0;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+/* Affirm payoff progress bar */
+.progress-bar {
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 10px; /* optional, since you already use pp-mt-10 */
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #4A6CF7;
+    border-radius: 999px;
+}
+
+
+/* ================================================================= */
+/*                        METRIC CARD GRID                           */
+/* ================================================================= */
+
+.pro-metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 25px;
+}
+
+.pro-card {
+    padding: 18px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+.pro-card-title {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.pro-card-value {
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+/* Gradient accents */
+.gradient-blue { border-left: 6px solid #3D52A0; }
+.gradient-green { border-left: 6px solid #4CAF50; }
+.gradient-red { border-left: 6px solid #E53935; }
+.gradient-orange { border-left: 6px solid #FF9800; }
+
+/* ================================================================= */
+/*                       DASHBOARD SECTIONS                          */
+/* ================================================================= */
+
+.dashboard-section {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.10);
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* BILLS GRID */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
+    gap: 14px;
+}
+
+.dash-bill-card {
+    background: white;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* =========================================
+   DASHBOARD – Hide Card Button
+========================================= */
+.dashboard-hide-card-wrap {
+    position: relative;
+}
+
+.dashboard-hide-form {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    margin: 0;
+}
+
+.dashboard-hide-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 999px;
+    background: #eef1f7;
+    color: #667085;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.dashboard-hide-btn:hover {
+    background: #e53935;
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.dashboard-hide-btn:focus {
+    outline: 2px solid #3D52A0;
+    outline-offset: 2px;
+}
+
+/* Overdue Red Highlight */
+.overdue-card {
+    border-left: 6px solid #E53935;
+}
+
+/* TAB BUTTON ACTIVE STATE */
+.bill-tabs .tab-btn.active {
+    background-color: #4A6CF7;   /* your blue shade */
+    color: #fff;
+    border-color: #4A6CF7;
+}
+
+.bill-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.bill-name {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.bill-autopay {
+    font-size: 13px;
+    opacity: 0.85;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.bill-autopay.autopay-true {
+    color: #4CAF50;
+}
+
+.bill-autopay.autopay-false {
+    color: #E53935;
+}
+
+/* =========================================
+    DASHBOARD – Soft Section Divider
+========================================= */
+.dashboard-soft-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 26px 0 22px;
+    color: #667085;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.dashboard-soft-divider::before,
+.dashboard-soft-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+        to right,
+        rgba(0,0,0,0),
+        #d6d9e6,
+        rgba(0,0,0,0)
+    );
+}
+
+.dashboard-soft-divider span {
+    white-space: nowrap;
+}
+
+
+/* ================================================================= */
+/*                        BILL CATEGORY PILL                        */
+/* ================================================================= */
+.bill-pill {
+    display: inline-flex;
+    align-items: center;
+    background: #EDE8F5;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.pill-icon {
+    margin-right: 6px;
+}
+
+.pill-text {
+    font-weight: 600;
+}
+
+
+
+
+/* ================================================================= */
+/*                     CALENDAR – HEAT MAP COLORS                    */
+/* ================================================================= */
+
+/* 🎨 TRAFFIC LIGHT HEAT MAP
+/* 1 bill → soft green */
+.heat-1 {
+    background: #d4edda !important;   /* light green */
+}
+
+/* 2 bills → soft yellow */
+.heat-2 {
+    background: #fff3cd !important;   /* light yellow */
+}
+
+/* 3 bills → light red */
+.heat-3 {
+    background: #f8d7da !important;   /* soft red/pink */
+}
+
+/* 4+ bills → strong warm red */
+.heat-4 {
+    background: #f5b7b1 !important;   /* strong warm red */
+}
+
+/* =============================
+      HEAT MAP TOGGLE SWITCH
+   ============================= */
+
+   .heat-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+/* Toggle switch styling */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #bbb;
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #3D52A0;
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+.heat-label {
+    font-weight: 600;
+    color: #333;
+}
+
+
+/* Calendar Grid */
+.calendar-wrapper {
+    margin-top: 20px;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    gap: 6px;
+}
+
+.calendar-day {
+    min-height: 110px;
+    padding: 6px;
+    border-radius: 8px;
+    background: white;
+    position: relative;
+    border: 1px solid #ddd;
+}
+
+.calendar-day.today {
+    border: 2px solid #3D52A0;
+}
+
+.calendar-day.paycheck-window {
+    border: 2px dashed #3D52A0;
+}
+
+/* Day Number */
+.day-number {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+/* Payday Label */
+.payday-pill {
+    background: #3D52A0;
+    color: white;
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    border-radius: 8px;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+/* Bill pill inside calendar */
+.bill-clickable {
+    margin-top: 6px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    background: none !important;   /* <-- FIX */
+}
+
+
+.calendar-mark-btn {
+    margin-left: 8px;
+    color: green;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* TODAY BANNER */
+.calendar-day.today {
+    position: relative;
+    border: 2px solid #3D52A0 !important;
+    box-shadow: 0 0 10px rgba(61,82,160,0.35);
+}
+
+.today-banner {
+    background: #3D52A0;
+    color: white;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 4px;
+}
+
+
+
+/* ================================================================= */
+/*                     PAID VS UNPAID BILL PILL                     */
+/* ================================================================= */
+
+.bill-paid {
+    background: #c4e8d1 !important;    /* mid mint green */
+    border-left: 4px solid #2f8f4e;    /* deeper green border */
+    color: #1b5e20 !important;         /* stronger readable green text */
+    opacity: 1 !important;             /* no fading */
+}
+
+.bill-unpaid {
+    background: #ffeb99 !important;     /* bright amber */
+    border-left: 4px solid #e6b800;     /* strong golden border */
+    color: #5a4a00;                      /* dark text for readability */
+    opacity: 1;
+}
+
+/* Remove strike-through */
+.bill-unpaid .pill-text {
+    color: #5a4a00 !important;
+}
+
+/* paid checkmark */
+.bill-paid .paid-check {
+    color: #2f8f4e !important;
+}
+
+.bill-paid .pill-text {
+    color: #1b5e20 !important;
+}
+
+/* unpaid icon link */
+.bill-unpaid .calendar-mark-btn {
+    color: #b88600 !important;
+}
+
+
+/* ================================================================= */
+/*                        CALENDAR BILL CATEGORY PILL                */
+/* ================================================================= */
+/* CATEGORY COLORS FOR BILL PILLS */
+.cat-rent      { background: #e6f0ff !important; border-left: 4px solid #4a90e2; }
+.cat-utilities { background: #f9ffe6 !important; border-left: 4px solid #a8c92c; }
+.cat-home      { background: #fff0e6 !important; border-left: 4px solid #e88f23; }
+.cat-credit    { background: #ffe6e6 !important; border-left: 4px solid #d64545; }
+.cat-loans     { background: #f0e6ff !important; border-left: 4px solid #7f4ac9; }
+.cat-auto      { background: #e6fff9 !important; border-left: 4px solid #20bfa9; }
+.cat-subs      { background: #fbe6ff !important; border-left: 4px solid #c920bf; }
+.cat-ins       { background: #e6f7ff !important; border-left: 4px solid #33a1c9; }
+.cat-misc      { background: #f5f5f5 !important; border-left: 4px solid #888; }
+
+/* Improve pill contrast against heat backgrounds */
+.bill-pill {
+    mix-blend-mode: normal;
+}
+
+/* Disable blend mode when heat is off */
+.heat-off .bill-pill {
+    mix-blend-mode: normal !important;
+}
+
+/* Only blend pills into heat colors when heat is ON */
+.heat-on .bill-pill {
+    mix-blend-mode: multiply !important;
+}
+
+/* CATEGORY LEGEND BAR */
+.category-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 22px;
+    margin: 18px 0 10px;
+    padding: 12px 16px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.category-legend div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+}
+
+.legend-pill {
+    width: 18px;
+    height: 10px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+
+/* =============================
+        FLASH MESSAGE STYLES (PRO)
+   ============================= */
+.flash-container {
+    max-width: 500px;
+    margin: 10px auto;    
+    margin-bottom: 15px;
+}
+
+.flash {
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* Success Flash (Paid + Undo link) */
+.flash.success {
+    background: #3D52A0;          /* your blue */
+    color: white;
+    border: 1px solid #a5d6a7;
+}
+
+.flash-error {
+    background: #fdecea;
+    color: #c62828;
+    border: 1px solid #f5b5b5;
+}
+
+/* Warning Flash (Undo → Unpaid) */
+.flash.warning {
+    background: #E6B800;          /* amber */
+    color: #3a2f00;
+}
+
+/* Force links inside flash to stay readable */
+.flash a {
+    color: #fff !important;
+    text-decoration: underline !important;
+}
+
+
+/* ============================
+MONTH NAVIGATION Prev and Next
+   ============================ */
+
+.month-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin: 18px 0;
+}
+
+.month-nav .nav-btn {
+    background: #3D52A0;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.25s ease, transform 0.15s ease;
+}
+
+.month-nav .nav-btn:hover {
+    background: #2E3E7A;
+    transform: translateY(-2px);
+}
+
+.month-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #3D52A0;
+}
+
+
+/* ================================================================= */
+/*                         MANAGE BILLS TABLE                        */
+/* ================================================================= */
+
+/* this controls padding & borders for both cells. */
+.pro-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.pro-table th,
+.pro-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+/* this controls header color, text alignment, weight. */
+.pro-table th {
+    background: #F2F2F2;
+    text-align: left;
+    font-weight: 600;
+}
+
+/* Sticky Table Header */
+.pro-table thead th {
+    position: sticky;
+    top: 0px;
+    background: #EDE8F5 !important;
+    z-index: 30;
+    border-bottom: 2px solid #ddd;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.pro-table thead th.sticky-table-header {
+    /* shadow handled by JS class */
+}
+
+.pro-table thead th.scrolled {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.18);
+}
+
+/* =========================================
+UNASSIGNED BILLS — COLUMN LAYOUT (FIXED)
+========================================= */
+
+.pro-table-unassigned {
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* Column widths (single source of truth) */
+/* Unassigned Bills column widths (single source of truth) */
+.pro-table-unassigned .col-check    { width: 44px; }
+.pro-table-unassigned .col-bill     { width: 240px; }
+.pro-table-unassigned .col-date     { width: 85px; }
+.pro-table-unassigned .col-category { width: 150px; }
+.pro-table-unassigned .col-amount   { width: 110px; }
+.pro-table-unassigned .col-status   { width: 80px; }
+.pro-table-unassigned .col-autopay  { width: 70px; }
+.pro-table-unassigned .col-assign   { width: 240px; }
+
+/* Fallback: hide the 6th column (adjust if your column order differs) */
+body.paycheck-planner-page .pro-table-unassigned th:nth-child(6),
+body.paycheck-planner-page .pro-table-unassigned td:nth-child(6){
+  display: none;
+}
+
+
+
+/* Amount column alignment */
+.pro-table-unassigned th.col-amount,
+.pro-table-unassigned td.money {
+    text-align: right;
+    white-space: nowrap;
+    padding-right: 16px;   /* breathing room BEFORE Status */
+    width: 110px;
+}
+
+/* Money alignment + breathing room away from Status */
+.pro-table-unassigned th.money,
+.pro-table-unassigned td.money {
+    text-align: right;
+    padding-right: 16px;
+}
+
+.pro-table-unassigned th,
+.pro-table-unassigned td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+/* Status + AutoPay centered */
+.pro-table-unassigned td:nth-child(5),
+.pro-table-unassigned td:nth-child(6) {
+    text-align: center;
+}
+
+/* Assign cell layout */
+.pp-assign-cell {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pp-assign-btn {
+    min-width: 70px;
+}
+
+/* Smooth sticky header shadow */
+.sticky-table-header {
+    box-shadow: 0 0 0 rgba(0,0,0,0);    /* no shadow initially */
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.sticky-table-header.scrolled {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.18);   /* smooth fade-in shadow */
+}
+
+/* Hover highlight */
+.pro-table tbody tr:hover {
+    background: #f8f8ff;
+}
+
+.col-amount {
+    width: 110px;
+    text-align: right;
+  }
+  
+  .col-status {
+    width: 90px;
+    text-align: center;
+  }
+  
+  .col-autopay {
+    width: 80px;
+    text-align: center;
+  }
+
+  .col-status,
+.col-autopay {
+  font-size: 0.9rem;
+}
+
+.col-autopay span {
+    display: inline-block;
+    min-width: 18px;
+  }
+
+  .col-assign {
+    width: 260px; /* KEY FIX */
+  }
+/* ================================================================= */
+/*                STICKY HEADERS FOR PAYCHECK TABLES                */
+/* ================================================================= */
+
+.paycheck-table-wrapper {
+    max-height: 360px;       /* table becomes scrollable */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+/* Sticky thead */
+.paycheck-table thead th {
+    position: sticky;
+    top: 0;
+    background: #EDE8F5;    /* matches your PRO theme */
+    z-index: 5;
+    box-shadow: 0 2px 2px rgba(0,0,0,0.06);
+}
+
+/* Improve table readability */
+.paycheck-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.paycheck-table td,
+.paycheck-table th {
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+}
+/* =========================================
+/* Paycheck Planner: sticky table headers should sit BELOW the sticky top nav row */
+body.paycheck-planner-page .pro-table thead th{
+    top: 76px;
+    z-index: 30;
+}
+
+/* Paycheck Planner: Unassigned Bills table should not crush columns */
+body.paycheck-planner-page .pp-table-scroll .pro-table-unassigned{
+    min-width: 0;      /* ✅ allow it to shrink to the container */
+    width: 100%;
+}
+
+body.paycheck-planner-page #paycheckLaneGrid.paycheck-lane-grid{
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    flex-wrap: nowrap !important;
+}
+
+
+/* ============================================================
+    PAYCHECK PLANNER — Header polish + consistent spacing
+   ============================================================ */
+    body.paycheck-planner-page .page-title.pro-title {
+    margin: 4px 0 4px;
+    letter-spacing: -0.2px;
+}
+
+body.paycheck-planner-page .page-subtitle {
+    margin: 0 0 12px;
+    line-height: 1.35;
+    max-width: 70ch;
+}
+
+  /* Give the top tabs a little breathing room under the nav row */
+body.paycheck-planner-page .pp-mb-16 {
+    margin-top: 10px;
+}
+
+/* Make all sections match (same card look) */
+.paycheck-planner-page .dashboard-section{
+    background: #fff;
+    border: 1px solid #e6eaf2;
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(16,24,40,.06);
+    padding: 18px 18px 16px;
+    margin: 16px 0;
+}
+
+  /* Tighten section headings a bit */
+body.paycheck-planner-page .dashboard-section h2 {
+    margin: 0 0 10px;
+}
+
+.paycheck-planner-page .dashboard-section > h2{
+    margin: 0 0 6px 0;
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+.paycheck-planner-page .dashboard-section > p{
+    margin: 0 0 12px 0;
+}
+
+  /* Make Planner Summary card titles look cleaner */
+body.paycheck-planner-page .pro-card h3 {
+    margin: 0 0 6px;
+    font-size: 1.02rem;
+}
+
+/* Paycheck Planner - Unassigned Bills: scroll container */
+body.paycheck-planner-page .pp-table-scroll{
+    max-height: 420px;        /* adjust as you like */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+  /* Sticky header INSIDE the scroll container */
+body.paycheck-planner-page .pp-table-scroll .pro-table thead th{
+    position: sticky;
+    top: 0;                   /* key change */
+    z-index: 5;
+    background: #EDE8F5;      /* solid paint so rows don't show through */
+    background-clip: padding-box;
+}
+
+
+/* ✅ Paycheck Planner — Assign column: let dropdown breathe */
+body.paycheck-planner-page .pp-assign-cell{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+}
+
+body.paycheck-planner-page .pp-assign-select{
+    flex: 1 1 auto;        /* take remaining space */
+    width: auto;           /* override old fixed width */
+    max-width: none;       /* remove 170/220 caps */
+   
+}
+
+body.paycheck-planner-page .pp-assign-btn{
+    flex: 0 0 auto;        /* button never shrinks */
+}
+
+/* ================================================================= */
+/*                   PAYCHECK TABLE — ZEBRA STRIPING                */
+/* ================================================================= */
+
+.paycheck-table tbody tr:nth-child(odd) {
+    background: #fafafa;
+}
+
+.paycheck-table tbody tr:nth-child(even) {
+    background: #ffffff;
+}
+
+/* Hover */
+.paycheck-table tbody tr:hover {
+    background: #f0f2ff !important;
+}
+
+/* ================================================================= */
+/*                   PRO TABLE — ZEBRA STRIPING                      */
+/* ================================================================= */
+
+.pro-table tbody tr:nth-child(odd) {
+    background: #fafafa;   /* light gray */
+}
+
+.pro-table tbody tr:nth-child(even) {
+    background: #ffffff;   /* white */
+}
+
+/* Hover effect (keeps it consistent with Paycheck tables) */
+.pro-table tbody tr:hover {
+    background: #f0f2ff !important;   /* soft lavender */
+}
+
+/* Overdue rows get priority highlight */
+.row-overdue {
+    background: #ffe5e5 !important;   /* soft red tint */
+}
+
+
+/* ================================================================= */
+/*                   AUTOPAY ICONS (YES / NO)                       */
+/* ================================================================= */
+
+.autopay-yes {
+    color: #2e7d32;       /* green */
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.autopay-no {
+    color: #c62828;       /* red */
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.autopay-indicator {
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0.85;
+}
+
+.autopay-indicator .autopay-true {
+    color: #4CAF50;  /* optional green for AutoPay */
+}
+
+.autopay-indicator .autopay-false {
+    color: #E53935;  /* optional red for Manual Pay */
+}
+
+
+/* ================================================================= */
+/*                          MODAL STYLING                            */
+/* ================================================================= */
+.modal-overlay,
+#quickAddModal,
+#categoryModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.hidden { display: none !important; }
+
+.modal-box {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Fields */
+.form-field, .form-field-large {
+    margin-bottom: 15px;
+}
+
+.form-field label,
+.form-field-large label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select,
+.form-field-large textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+}
+
+/* Category groups */
+.category-group {
+    margin-top: 15px;
+}
+
+.category-group-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.category-group ul {
+    list-style: none;
+}
+
+.category-group ul li {
+    padding: 8px;
+    background: #F4F4F8;
+    margin-bottom: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.category-group ul li:hover {
+    background: #E0DFF4;
+}
+
+/* Quick Add modal actions */
+.form-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Make category modal options show pointer cursor */
+#categoryModal ul li {
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+/* Optional: nicer hover + slight lift */
+#categoryModal ul li:hover {
+    background: #f0f0ff;
+    transform: translateX(3px);
+}
+
+/* =============================================================== */
+/*              PRO CATEGORY PICKER GRID (Modal Upgrade)           */
+/* =============================================================== */
+
+.category-pro-modal {
+    width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* 2-column responsive grid */
+.category-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 18px;
+}
+
+/* Category card */
+.category-card {
+    background: #F7F6FF;
+    border: 1px solid #d9d6f2;
+    padding: 14px 12px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease,
+                border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Emoji size */
+.cat-emoji {
+    font-size: 1.4rem;
+}
+
+/* Label */
+.cat-label {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Hover effect */
+.category-card:hover {
+    background: #ECE9FF;
+    border-color: #B6B0F0;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+}
+
+/* Active click feedback */
+.category-card:active {
+    transform: translateY(0px) scale(0.98);
+}
+
+/* Mobile layout */
+@media (max-width: 480px) {
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ================================================================= */
+/*                        TABS STYLING                               */
+/* ================================================================= */
+
+.bill-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.tab-btn {
+    background: #ddd;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.tab-btn.active {
+    background: #3D52A0;
+    color: white;
+}
+
+/* ================================================================= */
+/*                    STICKY HEADER FOR BILLS PAGE                   */
+/* ================================================================= */
+
+.sticky-bills-header {
+    position: sticky;
+    top: 0;
+    background: #F7F8FA;
+    padding: 15px 0 20px;
+    z-index: 20;
+    border-bottom: 2px solid #e2e2ee;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* Search + Category Filter layout */
+.filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+/* Bigger search input */
+.search-input {
+    flex: 1;
+    padding: 12px 14px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Bigger category dropdown */
+.category-filter {
+    width: 220px;
+    padding: 12px 14px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Make header buttons not shrink */
+.pro-button-row {
+    flex-wrap: wrap;
+}
+
+/* ================================================================= */
+/*                STICKY HEADER FOR OCCURRENCES PAGE                */
+/* ================================================================= */
+
+.sticky-occ-header {
+    position: sticky;
+    top: 0;
+    background: #F7F8FA;
+    padding: 15px 0 20px;
+    z-index: 20;
+    border-bottom: 2px solid #e2e2ee;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* Search + Category Filter layout */
+.filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+/* Bigger search input */
+.search-input {
+    flex: 1;
+    padding: 12px 14px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Bigger dropdown */
+.category-filter {
+    width: 220px;
+    padding: 12px 14px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* ================================================================= */
+/*                STICKY HEADER FOR CALENDAR PAGE                     */
+/* ================================================================= */
+
+.calendar-sticky-header{
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: #F7F8FA;
+    padding: 15px 0 12px;
+    border-bottom: 2px solid #e2e2ee;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* When the whole calendar header is sticky, we don't need the button row to be sticky too */
+.calendar-sticky-header .pro-button-row{
+    position: static;
+    top: auto;
+    background: transparent;
+    padding: 0;
+    z-index: auto;
+}
+
+/* =============================================================== */
+/*             PROFESSIONAL FORM LAYOUT (ADD / EDIT BILL)          */
+/* =============================================================== */
+
+.form-container-pro {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.pro-form-card {
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    margin-top: 12px;
+}
+
+.pro-form-card .form-field,
+.pro-form-card .form-field-large {
+    margin-bottom: 18px;
+}
+
+.pro-form-card label {
+    font-weight: 600;
+    color: #3D52A0;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.pro-form-card input,
+.pro-form-card select,
+.pro-form-card textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cfcfcf;
+    border-radius: 8px;
+    background: #F9F9FC;
+    font-size: 1rem;
+}
+
+.pro-form-card input:focus,
+.pro-form-card select:focus,
+.pro-form-card textarea:focus {
+    outline: none;
+    border-color: #3D52A0;
+    box-shadow: 0 0 6px rgba(61,82,160,0.3);
+}
+
+.category-select-btn {
+    background: #EDE8F5;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #cfcfcf;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.category-select-btn:hover {
+    background: #e3e0f3;
+}
+
+/* Button row */
+.pro-form-card .form-actions {
+    margin-top: 25px;
+    display: flex;
+    gap: 14px;
+}
+
+/* =============================================================== */
+/*                2-COLUMN PROFESSIONAL FORM LAYOUT                */
+/* =============================================================== */
+
+.two-column-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px 26px;
+}
+
+.two-column-form .form-full {
+    grid-column: 1 / 3;  /* spans both columns */
+}
+
+.two-column-form .form-field,
+.two-column-form .form-field-large {
+    display: flex;
+    flex-direction: column;
+}
+
+.two-column-form textarea {
+    resize: vertical;
+}
+
+/* Category button matches input styling */
+.category-select-btn {
+    background: #F9F9FC;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #cfcfcf;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.category-select-btn:hover {
+    background: #f0eef9;
+}
+
+/* Responsive – switches to 1 column on smaller screens */
+@media (max-width: 780px) {
+    .two-column-form {
+        grid-template-columns: 1fr;
+    }
+    .two-column-form .form-full {
+        grid-column: 1;
+    }
+}
+
+/* ================================================================= */
+/*                     OVERDUE COUNT BADGE (PRO)                     */
+/* ================================================================= */
+
+.badge-overdue {
+    background: #E53935;          /* red */
+    color: white;
+    padding: 2px 10px;
+    font-size: 0.85rem;
+    border-radius: 20px;
+    font-weight: 700;
+    margin-left: 8px;
+    display: inline-block;
+}
+
+/* Smaller badge for tab button */
+.badge-overdue.small {
+    padding: 1px 8px;
+    font-size: 0.75rem;
+    border-radius: 14px;
+}
+
+/* ============================================================
+    WEEKLY TOTAL ROW STYLE
+   ============================================================ */
+   .week-total-row {
+    grid-column: span 7;
+    background: #3D52A0;
+    color: white;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    text-align: right;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+
+/* ============================================================
+    FORECAST Styling
+   ============================================================ */
+.money { 
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.floating-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 30px;
+    background: #3D52A0;
+    color: white;
+    font-size: 2rem;
+    padding: 12px 20px;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    text-decoration: none;
+}
+
+/* ===== Forecast – Starting Balance Override ===== */
+
+body.forecast-page .forecast-override-form {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+body.forecast-page .forecast-override-input {
+    width: 150px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+}
+
+body.forecast-page .forecast-override-submit {
+    background: #3D52A0;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+body.forecast-page .forecast-override-submit:hover {
+    background: #2E3E7A;
+}
+
+body.forecast-page .forecast-override-help {
+    font-size: 0.85rem;
+    color: #666;
+    flex-basis: 100%;
+    margin-top: 4px;
+}
+
+
+/* ================================================================= */
+/*                      FORECAST PAGE — PRO STYLING                  */
+/* ================================================================= */
+
+/* Attach a page-level class so styles apply ONLY on forecast.html */
+body.forecast-page {
+    padding-bottom: 50px;
+}
+
+/* ===== TABLE FOUNDATION ===== */
+body.forecast-page .pro-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    font-size: 0.95rem;
+    background: white;
+}
+
+/* ===== TABLE HEADERS ===== */
+body.forecast-page .pro-table thead th {
+    position: static !important;         /* remove sticky behavior */
+    top: auto !important;
+    background: #EDE8F5 !important;      /* soft purple header */
+    color: #333;
+    padding: 12px 14px !important;
+    font-weight: 600;
+    border-bottom: 2px solid #d6d6e5;
+    white-space: nowrap;
+}
+
+/* Align number columns to the right */
+body.forecast-page .pro-table thead th:nth-child(n+2) {
+    text-align: right !important;
+}
+
+/* ===== TABLE BODY ROWS ===== */
+body.forecast-page .pro-table tbody td {
+    padding: 12px 14px !important;
+    border-bottom: 1px solid #e4e4ee;
+    white-space: nowrap;
+}
+
+/* Right-align money values */
+body.forecast-page .pro-table td.money {
+    text-align: right !important;
+}
+
+/* Zebra striping */
+body.forecast-page .pro-table tbody tr:nth-child(odd) {
+    background: #fafafa;
+}
+
+body.forecast-page .pro-table tbody tr:nth-child(even) {
+    background: #ffffff;
+}
+
+/* Hover highlight */
+body.forecast-page .pro-table tbody tr:hover {
+    background: #f0f2ff !important;
+}
+
+/* ===== FORECAST Styling - NEGATIVE BALANCE ROW ===== */
+body.forecast-page .pro-table tbody tr.first-neg-row td{
+    background: #ffe5e5 !important;              /* stronger */
+    box-shadow: inset 6px 0 0 #d62828;           /* strong red bar */
+    font-weight: 700;
+  }
+
+body.forecast-page .pro-table tbody tr.neg-row td{
+    background: #fff7f7 !important;              
+    box-shadow: inset 6px 0 0 rgba(214,40,40,.20);
+    color: #444;  
+  }
+
+/* ===== ZERO (== 0) ===== */
+body.forecast-page .pro-table tbody tr.zero-row td {
+    background: #fffbe6 !important;              /* soft yellow */
+    box-shadow: inset 6px 0 0 rgba(240,180,41,.55);
+    font-weight: 600;
+  
+}
+
+body.forecast-page .pro-table td.negative {
+    color: #d62828 !important;
+    font-weight: 700;
+}
+
+/* add ⚠️ to the DATE cell of the first negative day */
+body.forecast-page .pro-table tbody tr.first-neg-row td:first-child::before {
+    content: "⚠️ ";
+  }
+
+/* ===== FORECAST SECTION WRAPPER ===== */
+body.forecast-page .dashboard-section {
+    background: white;
+    padding: 22px 26px;
+    border-radius: 14px;
+    margin-top: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+/* ===== INPUT FIELDS (Add Expense Form Uses This) ===== */
+body.forecast-page .input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    margin-bottom: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+/* Ensure Add Extra Expense card looks smooth */
+body.forecast-page .dashboard-section form label {
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: block;
+}
+
+/* Zero balance — neutral warning */
+.zero-row {
+    background-color: #fffbe6;
+}
+
+/* Numbers */
+.money.negative {
+    color: #d93025;
+    font-weight: 600;
+}
+
+.money.positive {
+    color: #137333;
+}
+
+
+/* ============================================================
+    FORECAST:  PAYCHECK WINDOW — CLEANER SPACING & ALIGNMENT
+   ============================================================ */
+
+.forecast-paycheck-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+body.forecast-page .forecast-window-dates{
+    background: #f5f6fb;
+    border: 1px solid #e6e8f2;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #3D52A0;
+}
+
+    /* Wrapper spacing */
+body.forecast-page .forecast-paycheck-window{
+    background: #ffffff;
+    border: 1px solid #e6e8f2;
+    border-radius: 14px;
+    padding: 18px 18px 14px;
+    box-shadow: 0 2px 10px rgba(16, 24, 40, 0.06);
+    margin: 14px 0 18px;
+    }
+
+body.forecast-page .forecast-paycheck-window h2{
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0 0 14px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1f2937;
+    }
+
+/* Forecast page tabs */
+.forecast-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.forecast-tabs .tab-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #f2f2f7;
+    cursor: pointer;
+    font-weight: 600;
+}
+.forecast-tabs .tab-btn.active {
+    background: #4A6CF7;
+    color: #fff;
+    border-color: #4A6CF7;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Forecast summary cards */
+.forecast-summary-grid{
+    display:grid;
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+    gap:12px;
+    margin: 14px 0 18px;
+}
+
+.forecast-summary-grid .pro-card{
+padding: 14px 16px;
+}
+
+.forecast-summary-grid .pro-card-title{
+font-weight: 700;
+color:#555;
+margin-bottom:6px;
+font-size: 0.95rem;
+}
+
+.forecast-summary-grid .pro-card-value{
+font-size: 1.2rem;
+font-weight: 800;
+}
+
+.forecast-summary-grid .muted{
+color:#777;
+font-weight:600;
+font-size:0.9rem;
+}
+
+@media (max-width: 1100px){
+.forecast-summary-grid{ grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+}
+@media (max-width: 560px){
+.forecast-summary-grid{ grid-template-columns: 1fr; }
+}
+
+
+body.forecast-page .paycheck-amount-row{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 12px 12px;
+    background: #fafbff;
+    border: 1px solid #e6e8f2;
+    border-radius: 12px;
+    margin: 10px 0 12px;
+}
+
+body.forecast-page .paycheck-amount-row label{
+    font-weight: 700;
+    color: #374151;
+  }
+
+/* Paycheck amount input */
+body.forecast-page .paycheck-amount-input{
+    width: 140px;
+    height: 40px;
+    padding: 8px 10px;
+    border: 1px solid #d6d9e6;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 1rem;
+    outline: none;
+  }
+
+  body.forecast-page .paycheck-amount-input:focus{
+    border-color: #3D52A0;
+    box-shadow: 0 0 0 3px rgba(61, 82, 160, 0.12);
+  }
+
+/* Save button */
+body.forecast-page .paycheck-save-btn,
+body.forecast-page .override-btn{
+  height: 40px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: #3D52A0;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+body.forecast-page .paycheck-save-btn:hover,
+body.forecast-page .override-btn:hover{
+  background: #2E3E7A;
+}
+
+/* “Overdue / Starting Balance” lines:  */
+body.forecast-page .paycheck-line{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 6px 0px;
+    margin: 0;
+    font-size: 0.95rem;             /* slightly smaller than body */
+    line-height: 1.35;
+    border-bottom: none;
+  }
+  
+  body.forecast-page .paycheck-line strong{
+    font-weight: 700;
+    color: #4b5563;                 /* muted slate */
+    letter-spacing: 0.1px;
+  }
+
+/* Right value (amount) */
+body.forecast-page .paycheck-line span,
+body.forecast-page .paycheck-line{
+    font-variant-numeric: tabular-nums; /* perfect number alignment */
+}
+
+/* Optional: emphasize Starting Balance row */
+body.forecast-page .paycheck-line.starting-balance{
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1f2937;
+}
+
+/* Instruction text */
+body.forecast-page .paycheck-instruction{
+    width: 100%;
+    color: #6b7280;
+    font-size: 0.92rem;
+    margin: 0;
+  }
+
+/* ============================================================
+   FORECAST: Paycheck mini summary card (2-row) + amount pills
+============================================================ */
+body.forecast-page .paycheck-mini-summary{
+    margin: 10px 0 12px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1px solid #e6e8f2;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(16, 24, 40, 0.04);
+  }
+  
+  body.forecast-page .paycheck-mini-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+  }
+  
+  body.forecast-page .paycheck-mini-row + .paycheck-mini-row{
+    border-top: 1px dashed #e6e8f2;
+  }
+  
+  body.forecast-page .paycheck-mini-label{
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #4b5563;
+    line-height: 1.25;
+  }
+  
+  body.forecast-page .paycheck-mini-value{
+    flex: 0 0 auto;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Right-side “pill” */
+  body.forecast-page .amount-pill{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    border: 1px solid #e6e8f2;
+    background: #f7f8fc;
+    white-space: nowrap;
+    min-width: 110px; /* keeps pills consistent width */
+    text-align: right;
+  }
+  
+  /* Variants */
+  body.forecast-page .amount-pill-warn{
+    background: #fff7ed;
+    border-color: #fed7aa;
+    color: #7c2d12;
+  }
+  
+  body.forecast-page .amount-pill-good{
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1e3a8a;
+  }
+  
+
+/* Override section: lighter sub-card */
+body.forecast-page .override-wrapper{
+    margin-top: 12px;
+    padding: 12px;
+    background: #fbfbfe;
+    border: 1px solid #eef0f7;
+    border-radius: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    align-items: center;
+  }
+
+  body.forecast-page .override-wrapper label{
+    width: 100%;
+    font-weight: 700;
+    color: #374151;
+  }
+
+  body.forecast-page .override-input{
+    width: 180px;
+    height: 40px;
+    padding: 8px 10px;
+    border: 1px solid #d6d9e6;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 1rem;
+  }
+
+
+/* Starting balance used: make it a subtle “status row” */
+body.forecast-page .starting-balance-used{
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #f6f8ff;
+    border: 1px solid #e3e8ff;
+    border-radius: 12px;
+    font-weight: 700;
+  }
+
+  body.forecast-page .forecast-divider{
+    border: none;
+    border-top: 1px solid #eef0f7;
+    margin: 16px 0 14px;
+  }
+  
+
+/* ===========================================
+   FORECAST - Negative Balance Warning List
+   ============================================ */
+
+
+.forecast-alert-list {
+    list-style: none;                 /* remove default bullets */
+    margin: 12px 0 6px;
+    padding-left: 0;
+}
+
+.forecast-alert-item {
+    display: flex;                    /* aligns date + amount in a row */
+    align-items: center;
+    gap: 8px;                         /* spacing between text segments */
+    padding: 4px 0;
+    font-size: 0.98rem;
+    color: #6a4b00;                   /* same brown tone as alert box */
+}
+
+.forecast-alert-item::before {
+    content: "•";                     /* custom bullet */
+    color: #d35400;                   /* soft orange for visibility */
+    font-size: 1.4rem;
+    margin-right: 6px;
+    line-height: 0.9;
+}
+/* Forecast Warning Box */
+.forecast-alert-container {
+    margin: 16px 0 22px;
+    padding: 0;
+}
+
+.forecast-alert-box {
+    background: #FFF7ED;
+    border-left: 6px solid #F59E0B;
+    padding: 14px 18px;
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+}
+
+.forecast-alert-box strong {
+    font-size: 1.05rem;
+    color: #92400E;
+}
+
+body.forecast-page .forecast-alert-box p {
+    margin: 8px 0 0;
+    color: #4B5563;
+    line-height: 1.45;
+}
+
+.forecast-alert-box {
+    scroll-margin-top: 90px; /* aligns with sticky nav when jumping */
+}
+
+/* Date links inside alert */
+.forecast-alert-date {
+    color: #1D4ED8;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+body.forecast-page .forecast-alert-date:hover {
+    text-decoration: underline;
+}
+
+.forecast-alert-sep {
+    color: #b54400;                   /* matches the date */
+}
+
+.forecast-alert-amount {
+    font-weight: 700;
+    color: #DC2626;                   /* stronger red for negative value */
+}
+
+.forecast-alert-footer {
+    margin-top: 6px;
+    font-size: 0.9rem;
+    color: #6B7280;
+}
+
+.forecast-deposit-tip {
+    background: #fff7d6;
+    border-left: 4px solid #e8b200;
+    padding: 12px 15px;
+    margin-top: 12px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* ============================
+   ADD EXTRA EXPENSE (UI UPGRADE)
+   ============================ */
+
+   .extra-card-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.extra-card {
+    background: white;
+    padding: 30px;
+    width: 420px;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+.extra-card .form-row {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.extra-card select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 1rem;
+    appearance: none;        /* cleaner look */
+}
+
+
+/* Optional: So arrow aligns cleanly */
+.extra-card .form-row select {
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+}
+
+.extra-card label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.extra-card input {
+    padding: 10px 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.extra-card input:focus {
+    outline: none;
+    border-color: #4A6CF7;
+    box-shadow: 0 0 4px rgba(74,108,247,0.4);
+}
+
+.full-width {
+    width: 100%;
+    text-align: center;
+}
+
+/* ============================
+/*  EXTRAS LIST COLOR */
+/* ============================ */
+.extra-deposit {
+    color: green;
+    font-weight: 600;
+}
+
+.extra-expense {
+    color: #b30000;
+    font-weight: 600;
+}
+
+/* Amounts inside tables */
+.amount-positive {
+    color: green;
+    font-weight: 600;
+}
+
+.amount-negative {
+    color: #b30000;
+    font-weight: 600;
+}
+
+/* Edit/Delete link styling */
+.small-link {
+    font-size: 0.9rem;
+    color: #3d52a0;
+    text-decoration: none;
+    margin-right: 6px;
+}
+
+.small-link:hover {
+    text-decoration: underline;
+}
+
+.small-link.danger {
+    color: #b30000;
+}
+
+.small-link.danger:hover {
+    text-decoration: underline;
+}
+
+
+
+/* ================================================================= */
+/*                     SMALL UTILITY CLASSES                         */
+/* ================================================================= */
+
+.empty-message {
+    font-style: italic;
+    padding: 10px;
+    color: #666;
+}
+
+.amount-footer {
+    font-weight: bold;
+}
+
+.status-footer strong {
+    display: block;
+}
+
+/* ================================================================= */
+/*                     MORE DROPDOWN                         */
+/* ================================================================= */
+/* Simple "More" dropdown for nav */
+.nav-more {
+    position: relative;
+}
+
+.nav-more summary {
+    list-style: none;
+}
+.nav-more summary::-webkit-details-marker { display:none; }
+
+.nav-more .pro-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nav-more-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    min-width: 220px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08); /* FIX: alpha */
+    padding: 8px;
+    z-index: 999; /* ensures it stays above sticky table header */
+}
+
+
+.nav-more-panel a {
+    display: block;
+    padding: 10px 10px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #111;
+    font-weight: 600;
+}
+
+.nav-more-panel a:hover {
+    background: #f2f4ff;
+}
+
+/* ============================================================
+PAYCHECK PLANNER - Sticky header inside each paycheck lane card
+============================================================ */
+
+body.paycheck-planner-page .paycheck-lane{
+    flex: 0 0 380px;            /* fixed lane width */
+    max-width: 420px;
+    scroll-snap-align: start;
+    overflow: visible; /* ensures the sticky header isn't constrained */
+}
+
+body.paycheck-planner-page .paycheck-lane-grid{
+  overflow-x: auto;                  /* horizontal scroll for lanes */
+  overflow-y: visible;               /* keep vertical sticky working */
+}
+
+body.paycheck-planner-page .lane-sticky-header{
+    position: sticky;
+    top: var(--pp-sticky-offset, 70px); /* sits below your nav/buttons */
+    z-index: 80;
+    background: #fff;
+    background-clip: padding-box;
+    padding: 10px 0;
+    border-bottom: 1px solid #e5e7eb;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+/* ============================================================
+PAYCHECK PLANNER — Lane header: no overlap + tighter spacing
+Make lane header sticky
+============================================================ */
+
+/* Tighten the lane card padding just a bit */
+body.paycheck-planner-page .paycheck-lane.pro-card{
+    padding-top: 12px;     /* was larger via .pro-card */
+    padding-bottom: 14px;
+}
+
+
+body.paycheck-planner-page .lane-sticky-header{
+    position: sticky;
+    top: var(--pp-sticky-offset, 70px);
+    z-index: 80;
+    background: #fff;
+    background-clip: padding-box;
+
+    /* tighter */
+    padding: 6px 0 8px;
+    border-bottom: 1px solid #e5e7eb;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+}
+
+  /* Optional: tighten the header text block itself */
+body.paycheck-planner-page .paycheck-lane-header{
+    padding-top: 0;        /* you currently have 2px :contentReference[oaicite:1]{index=1} */
+    line-height: 1.2;
+}
+
+
+body.paycheck-planner-page #paycheckLaneGrid{
+    scroll-margin-top: var(--pp-sticky-offset, 80px);
+}
+
+
+
+.pp-assign-cell{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+
+
+
+.paycheck-lane.pp-flash{
+    outline: 3px solid rgba(74, 108, 247, 0.35);
+    outline-offset: 6px;
+}
+
+
+/* ============================================================
+PAYCHECK PLANNER - PLANNER HEALTH SUMMARY (MVP)
+============================================================ */
+.pp-health-section .pp-health-head { margin-bottom: 10px; }
+.pp-health-subtitle { margin: 6px 0 0; color: #666; }
+
+.pp-health-grid{
+    display:grid;
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.pp-health-card{ padding: 14px; }
+
+.pp-health-label{
+    font-weight: 800;
+    color: #111;
+    font-size: 0.95rem;
+}
+
+.pp-health-label-link {
+    cursor: pointer;
+    user-select: none;
+}
+
+.pp-health-label-link:hover {
+    text-decoration: underline;
+}
+
+
+.pp-health-value{
+    font-weight: 900;
+    font-size: 1.25rem;
+    margin-top: 6px;
+}
+
+.pp-health-note{
+    margin-top: 6px;
+    color: #666;
+    font-size: 0.92rem;
+    line-height: 1.25;
+}
+
+/* Simple status tint */
+.pp-health-card.pp-health-ok{
+    border: 1px solid #d1fae5;
+    box-shadow: 0 0 0 2px rgba(16,185,129,0.15) inset;
+}
+
+.pp-health-card.pp-health-warn{
+    border: 1px solid #fee2e2;
+    box-shadow: 0 0 0 2px rgba(239,68,68,0.12) inset;
+}
+
+@media (max-width: 980px){
+    .pp-health-grid{ grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+}
+@media (max-width: 520px){
+    .pp-health-grid{ grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+    PAYCHECK PLANNER - PAGE POLISH (safe overrides)
+    ============================================================ */
+
+        .paycheck-planner-page .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 18px 18px 40px;
+        }
+
+        /* Top header */
+        .pro-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 2rem;
+            margin: 6px 0 4px;
+        }
+        .pro-title .emoji { font-size: 1.4rem; }
+        .page-subtitle { margin: 0 0 14px; color: #555; }
+
+        /* ============================================================
+        NAV BAR (match your screenshot)
+        ============================================================ */
+        .pp-nav {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 10px 0 18px;
+            align-items: center;
+        }
+
+        .pp-nav a,
+        .pp-nav summary {
+            background: #2f3f98;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255,255,255,0.12);
+            cursor: pointer;
+            user-select: none;
+        }
+        .pp-nav a:hover,
+        .pp-nav summary:hover { filter: brightness(1.06); }
+
+        .pp-nav details { position: relative; }
+        .pp-nav details[open] summary { filter: brightness(1.06); }
+
+        .pp-nav .pp-more-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+            min-width: 220px;
+            padding: 8px;
+            z-index: 50;
+        }
+        .pp-nav .pp-more-panel a {
+            background: transparent;
+            color: #111;
+            border: none;
+            display: block;
+            padding: 10px 10px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .pp-nav .pp-more-panel a:hover { background: #f3f4f6; }
+
+        /* ============================================================
+        SECTIONS / CARDS
+        ============================================================ */
+        .dashboard-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 16px;
+            margin: 14px 0;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+        }
+        .dashboard-section h2 { margin: 0 0 6px; }
+        .pp-muted { color: #666; }
+        .pp-mt-n6 { margin-top: -6px; }
+        .pp-mt-12 { margin-top: 12px; }
+        .pp-mb-14 { margin-bottom: 14px; }
+
+        .pp-row { display: flex; }
+        .pp-col { display: flex; flex-direction: column; }
+        .pp-gap-10 { gap: 10px; }
+        .pp-gap-12 { gap: 12px; }
+        .pp-ai-center { align-items: center; }
+        .pp-wrap { flex-wrap: wrap; }
+        .pp-w-100 { width: 100%; }
+        .pp-minw-180 { min-width: 180px; }
+        .pp-minw-220 { min-width: 220px; }
+        .pp-minw-260 { min-width: 260px; }
+        .pp-fw-700 { font-weight: 700; }
+        .pp-ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* ============================================================
+        PLANNER HEALTH SUMMARY (match screenshot)
+        ============================================================ */
+        .pp-health-section { padding-bottom: 14px; }
+
+        .pp-health-head { margin-bottom: 10px; }
+        .pp-health-subtitle { margin: 4px 0 0; color: #666; font-size: 0.95rem; }
+
+        .pp-health-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+        @media (max-width: 980px) {
+            .pp-health-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 520px) {
+            .pp-health-grid { grid-template-columns: 1fr; }
+        }
+
+        .pp-health-card {
+            border: 1px solid #eef0f5;
+            border-radius: 12px;
+            padding: 12px;
+            background: #fff;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+        }
+
+        .pp-health-label { font-weight: 800; font-size: 0.9rem; }
+        .pp-health-value { font-size: 1.2rem; font-weight: 900; margin-top: 6px; }
+        .pp-health-note { font-size: 0.9rem; color: #666; margin-top: 4px; }
+
+        .pp-health-ok { border-color: rgba(16,185,129,0.35); }
+        .pp-health-warn { border-color: rgba(245,158,11,0.35); }
+
+        /* ============================================================
+        SPLIT BILL HELPER
+        ============================================================ */
+        .pp-inline-msg {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            min-height: 18px;
+        }
+
+        /* ============================================================
+        PAYCHECK LANES (no drag/drop)
+        - header never overlaps
+        - bills list scrolls inside lane
+        ============================================================ */
+        .paycheck-lane-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+        @media (max-width: 1050px) {
+            .paycheck-lane-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 650px) {
+            .paycheck-lane-grid { grid-template-columns: 1fr; }
+        }
+
+        .paycheck-lane {
+            border: 1px solid #eef0f5;
+            border-radius: 12px;
+            padding: 12px;
+            background: #fff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .paycheck-lane-header {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin: 0;
+            padding: 8px 10px;
+            border: 1px solid #eef0f5;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .paycheck-lane-title {
+            font-weight: 900;
+            color: #111;
+        }
+
+        .paycheck-lane-amount {
+            font-weight: 800;
+            color: #444;
+            font-size: 0.95rem;
+        }
+        .paycheck-lane-amount strong { color: #111; }
+
+        .lane-totals {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #eef0f5;
+            font-size: 0.95rem;
+            justify-content: space-between;
+        }
+
+        .lane-items {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            /* scrolling list area */
+            max-height: 260px;
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        .lane-bill-card {
+            border: 1px solid #eef0f5;
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            background: #fff;
+        }
+
+        .lane-bill-title { font-weight: 900; }
+        .lane-bill-sub { color: #666; font-size: 0.9rem; margin-top: 2px; }
+        .lane-bill-meta { color: #555; font-size: 0.9rem; margin-top: 2px; }
+
+        .lane-bill-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+        .lane-bill-amount { font-weight: 900; }
+
+        .pp-btn-compact {
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        .money { text-align: right; white-space: nowrap; }
+
+        .pp-assign-cell {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;         /* ✅ allows button to drop if needed */
+        }
+
+        .pp-assign-select {
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            background: #fff;
+            font-weight: 600;
+            flex: 1 1 180px;
+            min-width: 180px;        /* ✅ smaller so it fits */
+            width: 100%;
+        }
+
+        .pp-flash { outline: 3px solid rgba(59,130,246,0.35); }
+
+        /* ============================================================
+        AFFIRM TRACKER (match screenshot)
+        ============================================================ */
+        .affirm-loans-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 12px;
+        }
+        @media (max-width: 1180px) {
+            .affirm-loans-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+        @media (max-width: 820px) {
+            .affirm-loans-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 520px) {
+            .affirm-loans-grid { grid-template-columns: 1fr; }
+        }
+
+        .affirm-card {
+            border: 1px solid #dbe3ff;
+            border-radius: 12px;
+            padding: 10px 10px;
+            background: #fff;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+        }
+        .affirm-card h3 {
+            margin: 0 0 6px;
+            font-size: 0.95rem;
+            font-weight: 900;
+        }
+        .affirm-card p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #333;
+            line-height: 1.25rem;
+        }
+
+        .progress-bar {
+            margin-top: 10px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #2f3f98;
+            border-radius: 999px;
+            width: 0%;
+        }
+
+/* ============================================================
+MANAGE BILLS (bills.html) — fix column bleed + sticky layering
+   ============================================================ */
+body.bills-page .sticky-bills-header {
+    position: sticky;
+    top: 0;
+    z-index: 500; /* keep header + dropdown above the table header */
+    background: #fff;
+}
+
+body.bills-page .pro-table {
+    width: 100%;
+    table-layout: fixed; /* KEY: prevents Bill Name from pushing into Amount */
+}
+
+body.bills-page .pro-table thead th {
+    position: sticky;
+    top: 140px;          /* keep your existing offset */
+    z-index: 100;        /* above rows, below nav dropdown (999) */
+    background: #efeaf7; /* matches your header tint */
+}
+
+  /* Column sizing */
+body.bills-page .pro-table th.col-billname,
+body.bills-page .pro-table td.billname-cell { width: 260px; }
+
+body.bills-page .pro-table th.col-amount,
+body.bills-page .pro-table td.amount-cell { width: 120px; }
+
+body.bills-page .pro-table th.col-category { width: 160px; }
+body.bills-page .pro-table th.col-recurrence { width: 140px; }
+body.bills-page .pro-table th.col-firstdue { width: 120px; }
+body.bills-page .pro-table th.col-autopay { width: 110px; }
+body.bills-page .pro-table th.col-enddate { width: 120px; }
+body.bills-page .pro-table th.col-actions,
+body.bills-page .pro-table td.action-cell { width: 150px; }
+
+  /* Prevent Bill Name text from spilling into Amount */
+body.bills-page .pro-table td.billname-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+  /* Keep money tight + right-aligned */
+body.bills-page .pro-table td.amount-cell {
+    white-space: nowrap;
+    text-align: right;
+}
+
+/* =========================================
+PAYCHECK PLANNER: 3-up lane paging
+========================================= */
+
+.pp-lane-pager{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:10px 12px;
+    border:1px solid #eef0f5;
+    border-radius:12px;
+    background:#fff;
+    margin:10px 0 14px;
+}
+
+.pp-lane-pager-mid{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:center;
+    text-align:center;
+}
+
+.pp-lane-pager-label{
+    color:#6b7280;
+    font-weight:600;
+}
+
+  /* Force 3 lanes across on desktop */
+.paycheck-lane-grid.pp-lanes-3up{
+    display:grid;
+    gap:14px;
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
+}
+
+  /* Responsive fallback */
+@media (max-width: 1100px){
+    .paycheck-lane-grid.pp-lanes-3up{
+        grid-template-columns: repeat(2, minmax(280px, 1fr));
+    }
+}
+@media (max-width: 720px){
+    .paycheck-lane-grid.pp-lanes-3up{
+        grid-template-columns: 1fr;
+    }
+}
+
+  /* Make lanes taller + allow more bills visible (scroll inside lane list) */
+.paycheck-lane{
+    display:flex;
+    flex-direction:column;
+}
+
+.lane-items{
+    flex:1;
+    min-height: 220px;
+    max-height: 520px;   /* adjust if you want even more */
+    overflow:auto;
+    padding-right: 4px;  /* keeps scrollbar from touching content */
+}
+
+/* ============================================================
+RESPONSIVE TWEAKS (Paycheck Planner / smaller screens)
+Add to bottom of global.css
+============================================================ */
+
+/* 1) Reduce overall page padding on smaller screens */
+@media (max-width: 900px) {
+body { padding: 16px 18px; }  /* was 20px 40px */
+}
+
+/* 2) Collapse 2-column dashboard layout into 1 column */
+@media (max-width: 900px) {
+.dashboard-container {
+    grid-template-columns: 1fr;           /* was 1fr 320px */
+}
+
+.right-panel-wrapper {
+    grid-column: 1 / -1;
+}
+}
+
+/* 3) Tighten section padding slightly so cards fit better */
+@media (max-width: 700px) {
+.dashboard-section { padding: 16px; }   /* was 20px */
+}
+
+/* 4) Mortgage Split Helper: stack nicely on narrow screens */
+@media (max-width: 700px) {
+.mortgage-split-helper .pp-row.pp-ai-center {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.mortgage-split-helper .pp-minw-260,
+.mortgage-split-helper .pp-minw-220,
+.mortgage-split-helper .pp-minw-180 {
+    min-width: 0 !important;
+    width: 100%;
+}
+
+.mortgage-split-helper .pp-row.pp-gap-10 {
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.mortgage-split-helper #btnSplitMortgage,
+.mortgage-split-helper #btnUndoMortgageSplit {
+    width: 100%;
+}
+}
+
+/* 5) Unassigned bills table: allow horizontal scroll instead of crushing columns */
+@media (max-width: 700px) {
+table { display: block; overflow-x: auto; }
+}
+
+@media (max-width: 720px){
+    body { padding: 16px 16px; }  /* your current padding is 20px 40px */
+    .pro-btn { padding: 9px 12px; font-size: 0.95rem; }
+}
+
+/* ============================
+   Split Bill Helper (Polish)
+   ============================ */
+
+/* Split Helper - Structured layout (fixes misalignment + button placement) */
+.pp-split-grid { width: 100%; }
+
+.pp-split-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.pp-split-row > div {
+  flex: 1 1 260px; /* makes columns line up nicely */
+  min-width: 240px;
+}
+
+.pp-split-row .pp-minw-180 {
+  flex: 0 0 220px; /* keep “Split across” a stable width */
+  min-width: 220px;
+}
+
+/* Row 2: Start dropdown + buttons aligned cleanly */
+.pp-split-row2 {
+  margin-top: 12px;
+  align-items: flex-end;
+}
+
+.pp-split-actions {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex: 0 0 auto;
+  padding-bottom: 2px; /* nudges buttons to align with select bottom */
+}
+
+/* Spacer under “Split across” so it aligns with columns that have helper text */
+.pp-split-spacer {
+  height: 18px;
+  margin-top: 6px;
+}
+
+/* Mobile: buttons drop below start paycheck cleanly */
+@media (max-width: 720px) {
+  .pp-split-actions {
+    width: 100%;
+    justify-content: flex-start;
+    padding-bottom: 0;
+    }
+}
+
+/* ---------- Split Bill Helper layout fix ---------- */
+
+/* Give the split helper some breathing room and a clean inner layout */
+.paycheck-planner-page .pp-split-grid{
+    margin-top: 10px;
+    display: grid;
+    gap: 14px;
+  }
+  
+  /* Row 1: 3 columns, aligned at bottom */
+  .paycheck-planner-page .pp-split-row{
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) minmax(260px, 1fr) minmax(200px, 0.8fr);
+    gap: 16px;
+    align-items: end;
+  }
+  
+  /* Row 2: Start paycheck + actions column */
+  .paycheck-planner-page .pp-split-row2{
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) auto;
+    gap: 16px;
+    align-items: end;
+  }
+  
+  /* Normalize labels so “3)” lines up with 1) and 2) */
+  .paycheck-planner-page .pp-split-row label,
+  .paycheck-planner-page .pp-split-row2 label{
+    display: block;
+    margin: 0 0 6px 0;
+    font-weight: 700;
+  }
+  
+  /* Make selects consistent height/spacing */
+  .paycheck-planner-page .pp-split-row select,
+  .paycheck-planner-page .pp-split-row2 select{
+    width: 100%;
+    min-height: 40px;
+  }
+  
+  /* Helper text spacing under selects */
+  .paycheck-planner-page .pp-split-row .pp-muted,
+  .paycheck-planner-page .pp-split-row2 .pp-muted{
+    margin-top: 6px;
+  }
+  
+  /* The spacer under Step 3 is no longer needed; keep it from affecting height */
+  .paycheck-planner-page .pp-split-spacer{
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Buttons: keep them together, aligned, not floating oddly */
+  .paycheck-planner-page .pp-split-actions{
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+    white-space: nowrap;
+    padding-bottom: 2px; /* tiny optical align with select */
+  }
+  
+  .paycheck-planner-page .pp-split-actions .pro-btn{
+    min-height: 40px;
+    padding: 10px 14px;
+  }
+  
+  /* Message bar under split helper */
+  .paycheck-planner-page #mortgageSplitMsg.pp-inline-msg{
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #e6eaf2;
+    background: #f8fafc;
+    min-height: 18px;
+  }
+  
+  /* Mobile: stack cleanly */
+  @media (max-width: 900px){
+    .paycheck-planner-page .pp-split-row{
+      grid-template-columns: 1fr;
+    }
+    .paycheck-planner-page .pp-split-row2{
+      grid-template-columns: 1fr;
+    }
+    .paycheck-planner-page .pp-split-actions{
+      justify-content: flex-start;
+    }
+  }
+  Why this fixes your screenshot issues
+  “3) Split across” was drifting because the row was behaving like flexible blocks with min-width constraints; now it’s 

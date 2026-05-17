@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Paycheck Planner</title>
+    <link rel="stylesheet" href="/static/global.css">
+</head>
+
+<body class="paycheck-planner-page">
+    <div class="page-container">
+  
+      <!-- PAGE HEADER -->
+      <h1 class="page-title pro-title">
+        <span class="emoji">🧾</span> Paycheck Planner
+      </h1>
+      <p class="page-subtitle">Assign bills to each paycheck so nothing slips through.</p>
+  
+      <!-- NAV -->
+      <div class="pp-nav">
+        <a href="/dashboard">🏠 Home</a>
+        <a href="/calendar/{{ today.year }}/{{ today.month }}">📅 Calendar</a>
+        <a href="/forecast">📊 Forecast</a>
+        <a href="/bills">📘 Bills</a>
+  
+        <details>
+          <summary>⋯ More</summary>
+          <div class="pp-more-panel">
+            <a href="/all_occurrences">📄 All Occurrences</a>
+            <a href="/add-extra">➕ Add Extra Expense</a>
+            <a href="/extras">📋 Extras List</a>
+          </div>
+        </details>
+      </div>
+  
+      <!-- PLANNER HEALTH SUMMARY -->
+      <section class="dashboard-section pp-health-section">
+        <div class="pp-health-head">
+          <h2 style="margin:0;">🧠 Planner Health Summary</h2>
+          <p class="pp-health-subtitle">Quick guardrails based on your current lane assignments.</p>
+        </div>
+  
+        <div class="pp-health-grid">
+          <div class="pp-health-card" id="healthMortgageCard">
+            <div class="pp-health-label pp-health-label-link"
+                 id="healthMortgageLabel"
+                 role="button"
+                 tabindex="0"
+                 title="Jump to this month’s first paycheck">
+              <span id="healthMortgageIcon">—</span>
+              <span id="healthMortgageLabelText">Mortgage Covered</span>
+            </div>
+            <div class="pp-health-value" id="healthMortgageValue">—</div>
+            <div class="pp-health-note" id="healthMortgageNote"></div>
+          </div>
+  
+          <div class="pp-health-card" id="healthOverdueCard">
+            <div class="pp-health-label">⚠️ Overdue Bills Unassigned</div>
+            <div class="pp-health-value" id="healthOverdueValue">—</div>
+            <div class="pp-health-note" id="healthOverdueNote"></div>
+          </div>
+  
+          <div class="pp-health-card" id="healthHotLaneCard">
+            <div class="pp-health-label">⚠️ Most Loaded Paycheck</div>
+            <div class="pp-health-value" id="healthHotLaneValue">—</div>
+            <div class="pp-health-note" id="healthHotLaneNote"></div>
+          </div>
+  
+          <div class="pp-health-card" id="healthLowestBufferCard">
+            <div class="pp-health-label">💵 Lowest Buffer</div>
+            <div class="pp-health-value" id="healthLowestBufferValue">—</div>
+            <div class="pp-health-note" id="healthLowestBufferNote"></div>
+          </div>
+        </div>
+      </section>
+  
+      <!-- SPLIT BILL HELPER -->
+      <section class="dashboard-section">
+        <h2>🏠 Split Bill Helper</h2>
+        <p class="pp-muted pp-mt-n6">Pick a bill name → pick which due date → split it across paychecks.</p>
+  
+        <div class="pp-split-grid">
+          <!-- Row 1 -->
+          <div class="pp-split-row">
+            <div class="pp-minw-260">
+              <label class="pp-fw-700">1) Bill Name</label>
+              <select id="splitBillNameSelect" class="override-input pp-w-100"></select>
+              <div class="pp-muted" style="font-size:12px; margin-top:6px;">
+                Example: Carrington Mortgage
+              </div>
+            </div>
+  
+            <div class="pp-minw-260">
+              <label class="pp-fw-700">2) Which Due Date?</label>
+              <select id="splitBillDueSelect" class="override-input pp-w-100" disabled></select>
+              <div class="pp-muted" style="font-size:12px; margin-top:6px;">
+                Choose March 1, April 1, etc.
+              </div>
+            </div>
+  
+            <div class="pp-minw-180">
+              <label class="pp-fw-700">3) Split across</label>
+              <select id="mortgageSplitCount" class="override-input pp-w-100">
+                <option value="2">2 paychecks</option>
+                <option value="3" selected>3 paychecks</option>
+              </select>
+              <div class="pp-muted pp-split-spacer" aria-hidden="true"></div>
+            </div>
+          </div>
+  
+          <!-- Row 2 -->
+          <div class="pp-split-row pp-split-row2">
+            <div class="pp-minw-240">
+              <label class="pp-fw-700">Start at paycheck</label>
+              <select id="mortgageStartPaycheck" class="override-input pp-w-100"></select>
+              <div class="pp-muted" style="font-size:12px; margin-top:6px;">
+                Auto-selected based on due date (you can change it)
+              </div>
+            </div>
+  
+            <div class="pp-split-actions">
+              <button type="button" class="pro-btn" id="btnSplitMortgage" disabled>Split Bill</button>
+              <button type="button" class="pro-btn" id="btnUndoMortgageSplit" disabled>Undo Split</button>
+            </div>
+          </div>
+  
+          <div id="mortgageSplitMsg" class="pp-inline-msg" aria-live="polite"></div>
+        </div>
+      </section>
+  
+      <!-- ✅ UNIFIED CONTAINER (same width / same "card" sizing) -->
+      <div class="pp-triple-stack">
+  
+        <!-- PAYCHECK LANES -->
+        <section class="dashboard-section">
+          <h2>Paycheck-by-Paycheck Calendar</h2>
+  
+          <div class="pp-row pp-gap-10 pp-wrap pp-mb-14">
+            <button type="button" class="pro-btn" id="btnResetAll">Reset All Assignments</button>
+            <button type="button" class="pro-btn" id="btnAutoAssignAll">Auto-Assign Due Before Next (All Paychecks)</button>
+          </div>
+  
+          <!-- Lane Pager (3 lanes at a time) -->
+          <div class="pp-lane-pager" aria-label="Paycheck lane paging controls">
+            <button type="button" class="pro-btn pp-btn-compact" id="ppPrevLanes">◀ Prev</button>
+  
+            <div class="pp-lane-pager-mid">
+              <span class="pp-lane-pager-label">Showing</span>
+              <strong><span id="ppLaneRange">1–3</span></strong>
+              <span class="pp-lane-pager-label">of</span>
+              <strong><span id="ppLaneTotal">0</span></strong>
+            </div>
+  
+            <button type="button" class="pro-btn pp-btn-compact" id="ppNextLanes">Next ▶</button>
+          </div>
+  
+          <div class="paycheck-lane-grid pp-lanes-3up" id="paycheckLaneGrid">
+            {% for d in paycheck_dates %}
+            <div class="paycheck-lane" data-paycheck="{{ d.strftime('%Y-%m-%d') }}">
+              <h3 class="paycheck-lane-header">
+                <div class="paycheck-lane-title">Paycheck Date: {{ d.strftime('%b %d, %Y') }}</div>
+  
+                <div class="paycheck-lane-right">
+                  <div class="paycheck-lane-amount">
+                    Paycheck Amount: <strong>${{ "%.2f"|format(paycheck_amount) }}</strong>
+                  </div>
+  
+                  <div class="lane-status-pills" aria-live="polite">
+                    <span class="lane-pill lane-pill-danger" data-lane-pill="negative" hidden>Over budget</span>
+                    <span class="lane-pill lane-pill-warn" data-lane-pill="nearfull" hidden>Nearly full</span>
+                  </div>
+                </div>
+              </h3>
+  
+              <div class="lane-totals">
+                <div><strong>Assigned:</strong> <span class="lane-total">$0.00</span></div>
+                <div><strong>Left:</strong> <span class="lane-left">$0.00</span></div>
+              </div>
+  
+              <div class="lane-items"></div>
+  
+              <div class="pp-row pp-gap-10 pp-wrap" style="margin-top:12px;">
+                <button type="button" class="pro-btn btn-auto-assign" data-paycheck="{{ d.strftime('%Y-%m-%d') }}">
+                  Auto-Assign Due Before Next
+                </button>
+  
+                <button type="button" class="pro-btn btn-clear-lane" data-paycheck="{{ d.strftime('%Y-%m-%d') }}">
+                  Clear Lane
+                </button>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </section>
+  
+        <!-- UNASSIGNED BILLS -->
+        <section class="dashboard-section">
+          <h2>Unassigned Bills</h2>
+          <p class="pp-muted pp-mt-n6">Assign a bill to a paycheck using the dropdown.</p>
+  
+          <!-- BULK ASSIGN TOOLBAR -->
+          <div class="pp-bulkbar" id="ppBulkBar">
+            <div class="pp-bulk-left">
+              <label class="pp-bulk-check">
+                <input type="checkbox" id="ppSelectAllUnassigned" />
+                <span>Select all</span>
+              </label>
+  
+              <span class="pp-bulk-count" id="ppBulkCount">0 selected</span>
+            </div>
+  
+            <div class="pp-bulk-actions">
+              <select id="ppBulkPaycheckSelect" class="pp-bulk-select" aria-label="Select paycheck for bulk assign"></select>
+  
+              <button type="button" class="pro-btn pp-btn-compact" id="ppBulkAssignBtn" disabled>
+                Assign Selected
+              </button>
+  
+              <button type="button" class="pro-btn pp-btn-compact cancel-btn" id="ppBulkClearBtn" disabled>
+                Clear
+              </button>
+            </div>
+          </div>
+  
+          <div class="pp-table-scroll">
+            <table class="pro-table pro-table-unassigned">
+              <thead>
+                <tr>
+                  <th class="col-check"><span class="pp-sr-only">Select</span></th>
+                  <th class="col-bill">Bill</th>
+                  <th class="col-date">Due Date</th>
+                  <th class="col-category">Category</th>
+                  <th class="col-amount money">Amount</th>
+                  <th class="col-status">Status</th>
+                  <th class="col-autopay">AutoPay</th>
+                  <th class="col-assign">Assign</th>
+                </tr>
+              </thead>
+              <tbody id="unassignedTbody">
+                <!-- filled by JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+  
+        <!-- AFFIRM PAYOFF TRACKER -->
+        <section class="dashboard-section">
+          <h2>✅ Affirm/Klarna Payoff Tracker</h2>
+  
+          <div class="affirm-loans-grid">
+            {% for a in payoff_loans %}
+            {% set pct = a.pct_paid if a.pct_paid is defined else 0 %}
+            {% if pct < 0 %}{% set pct = 0 %}{% endif %}
+            {% if pct > 100 %}{% set pct = 100 %}{% endif %}
+  
+            <div class="affirm-card">
+              <h3>{{ a.name }}</h3>
+              <p>
+                <strong>Monthly:</strong> ${{ "%.2f"|format(a.monthly) }}<br>
+                <strong>Remaining:</strong> ${{ "%.2f"|format(a.remaining) }}<br>
+                <strong>Est. Months Left:</strong> {{ a.months_left_est }}<br>
+                <strong>Paid:</strong> {{ a.paid_count }} / {{ a.total_count }}
+              </p>
+  
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ pct }}%;"></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </section>
+  
+      </div><!-- /.pp-triple-stack -->
+  
+    </div><!-- /.page-container -->
+  </body>
+  
+<script>
+    // -----------------------------
+    // DATA FROM SERVER
+    // -----------------------------
+    const SERVER_BILLS = {{ bills_json|safe }};
+    const PAYCHECKS = {{ paycheck_dates_json|safe }};
+    const PAYCHECK_AMOUNT = Number({{ paycheck_amount|float }});
+    const TODAY_STR = "{{ today.strftime('%Y-%m-%d') }}";
+
+    // localStorage keys
+    const ASSIGN_KEY = "paycheckPlannerAssignments_v1";
+    const CUSTOM_KEY = "paycheckPlannerCustom_v1";
+    // Bulk selection (Option A)
+    let SELECTED_UNASSIGNED = new Set();
+
+    // -----------------------------
+// PAYCHECK LANES: 3-at-a-time pager
+// -----------------------------
+const LANES_PER_PAGE = 3;
+let LANE_PAGE = Number(sessionStorage.getItem("ppLanePage") || 0);
+
+function getLaneEls() {
+    return Array.from(document.querySelectorAll(".paycheck-lane-grid .paycheck-lane"));
+}
+
+function clampLanePage(totalPages) {
+    if (totalPages <= 0) return 0;
+    if (LANE_PAGE < 0) LANE_PAGE = 0;
+    if (LANE_PAGE > totalPages - 1) LANE_PAGE = totalPages - 1;
+    return LANE_PAGE;
+}
+
+function updateLanePager() {
+    const lanes = getLaneEls();
+    const total = lanes.length;
+
+    const totalPages = Math.ceil(total / LANES_PER_PAGE);
+    clampLanePage(totalPages);
+
+    const startIdx = LANE_PAGE * LANES_PER_PAGE;
+    const endIdx = Math.min(startIdx + LANES_PER_PAGE, total);
+
+    // Show only lanes in the current page
+    lanes.forEach((lane, i) => {
+        lane.style.display = (i >= startIdx && i < endIdx) ? "" : "none";
+    });
+
+    // UI updates
+    const prevBtn = document.getElementById("ppPrevLanes");
+    const nextBtn = document.getElementById("ppNextLanes");
+    const rangeEl = document.getElementById("ppLaneRange");
+    const totalEl = document.getElementById("ppLaneTotal");
+
+    if (totalEl) totalEl.textContent = String(total);
+    if (rangeEl) rangeEl.textContent = total === 0 ? "0–0" : `${startIdx + 1}–${endIdx}`;
+
+    if (prevBtn) prevBtn.disabled = (LANE_PAGE <= 0);
+    if (nextBtn) nextBtn.disabled = (LANE_PAGE >= totalPages - 1);
+
+    sessionStorage.setItem("ppLanePage", String(LANE_PAGE));
+}
+
+function setLanePage(newPage) {
+    LANE_PAGE = Number(newPage || 0);
+    updateLanePager();
+}
+
+function ensureLaneVisible(paycheckDate) {
+    const lanes = getLaneEls();
+    const idx = lanes.findIndex(l => String(l.dataset.paycheck) === String(paycheckDate));
+    if (idx < 0) return;
+
+    const page = Math.floor(idx / LANES_PER_PAGE);
+    setLanePage(page);
+
+    // after it's visible, scroll
+    const laneEl = lanes[idx];
+    laneEl?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+
+
+    function loadAssignments() {
+        try {
+            const raw = localStorage.getItem(ASSIGN_KEY);
+            return raw ? JSON.parse(raw) : {};
+        } catch (e) {
+            return {};
+        }
+    }
+    function saveAssignments(assignments) {
+        localStorage.setItem(ASSIGN_KEY, JSON.stringify(assignments));
+    }
+
+    function loadCustom() {
+        try {
+            const raw = localStorage.getItem(CUSTOM_KEY);
+            if (!raw) return sanitizeCustom({ customBills: [], hiddenBillIds: [] });
+
+            const parsed = JSON.parse(raw);
+            parsed.customBills = parsed.customBills || [];
+            parsed.hiddenBillIds = parsed.hiddenBillIds || [];
+
+            const cleaned = sanitizeCustom(parsed);
+            saveCustom(cleaned);
+            return cleaned;
+        } catch (e) {
+            return sanitizeCustom({ customBills: [], hiddenBillIds: [] });
+        }
+    }
+    function saveCustom(obj) {
+        localStorage.setItem(CUSTOM_KEY, JSON.stringify(obj));
+    }
+
+    // ✅ Avoid timezone off-by-one for YYYY-MM-DD strings
+    function dateFromISO(iso) {
+        // forces LOCAL midnight instead of UTC
+        return new Date(String(iso).slice(0, 10) + "T00:00:00");
+    }
+
+    function formatPaycheckLabel(iso) {
+        return dateFromISO(iso).toLocaleDateString(undefined, {
+            month: "short",
+            day: "2-digit",
+            year: "numeric"
+        });
+    }
+
+    function money(n) {
+        const x = Number(n || 0);
+        return x.toLocaleString(undefined, { style: "currency", currency: "USD" });
+    }
+
+    function escapeHtml(str) {
+        return String(str || "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    function billById(BILLS, id) {
+        return BILLS.find(b => String(b.id) === String(id));
+    }
+
+    function normalizeBills() {
+        const custom = loadCustom();
+        const hidden = new Set((custom.hiddenBillIds || []).map(String));
+        const merged = [];
+
+        SERVER_BILLS.forEach(b => {
+            if (hidden.has(String(b.id))) return;
+            merged.push(b);
+        });
+
+        (custom.customBills || []).forEach(cb => merged.push(cb));
+
+        const seen = new Set();
+        const deduped = [];
+        for (const b of merged) {
+            const id = String(b?.id || "");
+            if (!id) continue;
+            if (seen.has(id)) continue;
+            seen.add(id);
+            deduped.push(b);
+        }
+        return deduped;
+    }
+
+    function isMortgageBill(b) {
+        const name = String(b.name || "").toLowerCase();
+        const cat = String(b.category || "").toLowerCase();
+        return (
+        cat === "rent/mortgage" ||
+        cat === "loans" ||
+        cat === "taxes" ||
+        cat === "utilities"
+    );
+    }
+
+    // ONLY Rent/Mortgage + Loans (as requested)
+    function isSplittableBill(b) {
+        const cat = String(b.category || "").toLowerCase().trim();
+        return (
+            cat === "rent/mortgage" ||
+            cat === "loans" ||
+            cat === "taxes" ||
+            cat === "utilities"
+        );
+    }
+
+    // -----------------------------
+    // SPLIT HELPER - Bill Name -> Due Date -> Split
+    // -----------------------------
+    function normalizeSplitKey(b) {
+        const name = String(b?.name || "").trim().toLowerCase();
+        // normalize category bucket (so minor variations don’t fragment)
+        const cat = String(b?.category || "").trim().toLowerCase();
+        return `${name}||${cat}`;
+    }
+
+    /**
+    * Builds an index like:
+    * {
+    *   "carrington mortgage||rent/mortgage": {
+    *        nameLabel: "Carrington Mortgage",
+    *        category: "Rent/Mortgage",
+    *        items: [occ1, occ2, occ3...] // occurrences
+    *   },
+    *   ...
+    * }
+    */
+    function buildSplitBillIndex() {
+        const candidates = (SERVER_BILLS || [])
+            .filter(isSplittableBill)
+            .slice()
+            .sort((a, b) => dateFromISO(a.due_date) - dateFromISO(b.due_date));
+
+        const idx = {};
+
+        for (const b of candidates) {
+            const key = normalizeSplitKey(b);
+            if (!idx[key]) {
+                idx[key] = {
+                    nameLabel: String(b.name || "").trim() || "(Unnamed Bill)",
+                    category: b.category || "",
+                    items: []
+                };
+            }
+            idx[key].items.push(b);
+        }
+
+        // Sort occurrences per bill by due date
+        Object.values(idx).forEach(group => {
+            group.items.sort((a, b) => dateFromISO(a.due_date) - dateFromISO(b.due_date));
+        });
+
+        return idx;
+    }
+
+    function formatDueOption(b) {
+        const due = String(b?.due_date || "").slice(0, 10);
+        const dueLabel =
+            String(b?.due_label || "").trim() ||
+            dateFromISO(due).toLocaleDateString(undefined, { month: "short", day: "2-digit", year: "numeric" });
+
+        const amt = money(b?.amount);
+        const ap = String(b?.autopay || "✖");
+        const status = String(b?.status || "Unpaid");
+
+        return `${dueLabel} — ${amt} • ${status} • AutoPay: ${ap}`;
+    }
+
+    function getClosestPaycheckOnOrBefore(targetISO) {
+        const target = dateFromISO(targetISO);
+        let best = null;
+
+        for (const pd of PAYCHECKS) {
+            const d = dateFromISO(pd);
+            if (d <= target) best = pd;
+            else break; // PAYCHECKS is chronological
+        }
+
+        // If everything is after target, fallback to first paycheck
+        return best || PAYCHECKS[0] || "";
+    }
+
+    function setSplitMsg(text, ok = true) {
+        const msgEl = document.getElementById("mortgageSplitMsg");
+        if (!msgEl) return;
+        msgEl.style.color = ok ? "#065f46" : "#b91c1c";
+        msgEl.textContent = text || "";
+    }
+
+
+    // -----------------------------
+    // MORTGAGE SPLIT HELPERS
+    // -----------------------------
+    function createMortgageSplits({ mortgageBillId, splitCount, startPaycheck }) {
+        const custom = loadCustom();
+        const BILLS = normalizeBills();
+
+        // Try current visible bills first, then fall back to SERVER_BILLS (important when original is hidden)
+        let mortgage = billById(BILLS, mortgageBillId);
+        if (!mortgage) mortgage = billById((SERVER_BILLS || []), mortgageBillId);
+
+        // If still not found, maybe user selected a split piece somehow → try its originalId
+        if (!mortgage) {
+            const maybeSplit = billById(BILLS, mortgageBillId) || billById((SERVER_BILLS || []), mortgageBillId);
+            const oid = maybeSplit?.meta?.originalId;
+            if (oid) mortgage = billById((SERVER_BILLS || []), String(oid));
+        }
+
+        if (!mortgage) return { ok:false, msg:"Could not find the bill to split." };
+
+        // ✅ IMPORTANT: treat the selected occurrence as the "root" so you can split March specifically
+        const rootOriginalId = String(mortgage.id);
+
+
+        const startIdx = PAYCHECKS.indexOf(startPaycheck);
+        if (startIdx < 0) return { ok:false, msg:"Start paycheck is not valid." };
+
+        const available = PAYCHECKS.slice(startIdx);
+        const n = Math.min(Number(splitCount || 3), available.length);
+        if (n <= 0) return { ok:false, msg:"No paychecks available to split across." };
+
+        const rootBill = billById(SERVER_BILLS || [], rootOriginalId) || mortgage;
+        const total = Number(rootBill.amount || 0);
+
+        const base = Math.floor((total / n) * 100) / 100;
+        const splits = [];
+        let running = 0;
+
+        for (let i = 0; i < n; i++) {
+            let amt = base;
+            if (i === n - 1) amt = Math.round((total - running) * 100) / 100;
+            running = Math.round((running + amt) * 100) / 100;
+
+            splits.push({
+                id: `mortgage_split_${rootOriginalId}_${available[i]}_${i+1}`,
+                name: `Split (${i+1}/${n}) — ${rootBill.name}`,
+                due_date: available[i],
+                due_label: new Date(available[i]).toLocaleDateString(undefined, { month:"short", day:"2-digit" }),
+                category: rootBill.category || "Rent/Mortgage",
+                amount: amt,
+                status: "Unpaid",
+                autopay: rootBill.autopay || "✖",
+                meta: { type:"mortgage_split", originalId: rootOriginalId, n:n }
+            });
+        }
+
+        const remainingCustom = (custom.customBills || []).filter(cb => {
+            const t = cb?.meta?.type;
+            const oid = cb?.meta?.originalId;
+            return !(t === "mortgage_split" && String(oid) === String(rootOriginalId));
+        });
+
+        custom.customBills = [...remainingCustom, ...splits];
+
+        const hiddenSet = new Set((custom.hiddenBillIds || []).map(String));
+        hiddenSet.add(String(rootOriginalId));
+        custom.hiddenBillIds = Array.from(hiddenSet);
+        saveCustom(custom);
+
+        const a = loadAssignments();
+
+        // Only remove splits for THIS bill (rootOriginalId), not all splits
+        const splitPrefix = `mortgage_split_${String(rootOriginalId)}_`;
+
+        for (const k of Object.keys(a)) {
+            a[k] = (a[k] || []).filter(x => !String(x).startsWith(splitPrefix));
+        }
+
+
+        splits.forEach((s, i) => {
+            const laneDate = available[i];
+            a[laneDate] = a[laneDate] || [];
+            a[laneDate].push(s.id);
+        });
+
+        saveAssignments(a);
+
+        return { ok:true, msg:`Split created across ${n} paycheck(s).` };
+    }
+
+    function undoMortgageSplits(mortgageBillId) {
+        mortgageBillId = String(mortgageBillId);
+        const custom = loadCustom();
+        const beforeCount = (custom.customBills || []).length;
+
+        custom.customBills = (custom.customBills || []).filter(cb => {
+            const t = cb?.meta?.type;
+            const oid = cb?.meta?.originalId;
+            return !(t === "mortgage_split" && String(oid) === String(mortgageBillId));
+        });
+
+        custom.hiddenBillIds = (custom.hiddenBillIds || []).filter(x => String(x) !== String(mortgageBillId));
+        sanitizeCustom(custom);
+        saveCustom(custom);
+
+        const a = loadAssignments();
+
+        // Only remove splits for THIS bill id (the original/root id)
+        const splitPrefix = `mortgage_split_${String(mortgageBillId)}_`;
+
+        for (const k of Object.keys(a)) {
+            a[k] = (a[k] || []).filter(x => !String(x).startsWith(splitPrefix));
+        }
+
+        saveAssignments(a);
+
+
+        const afterCount = (custom.customBills || []).length;
+        const removed = beforeCount - afterCount;
+
+        return { ok:true, msg:`Removed ${removed} split item(s) and restored the original bill.` };
+    }
+
+    function sanitizeCustom(custom) {
+        custom.customBills = custom.customBills || [];
+        custom.hiddenBillIds = custom.hiddenBillIds || [];
+
+        custom.customBills = custom.customBills.filter(cb => {
+            if (cb?.meta?.type !== "mortgage_split") return true;
+            const oid = String(cb?.meta?.originalId || "");
+            return !oid.startsWith("mortgage_split_");
+        });
+
+        const seenSplitKey = new Set();
+        custom.customBills = custom.customBills.filter(cb => {
+            if (cb?.meta?.type !== "mortgage_split") return true;
+
+            const oid = String(cb?.meta?.originalId || "");
+            const due = String(cb?.due_date || "");
+            const amt = Number(cb?.amount || 0).toFixed(2);
+
+            const key = `${oid}|${due}|${amt}`;
+            if (seenSplitKey.has(key)) return false;
+
+            seenSplitKey.add(key);
+            return true;
+        });
+
+        const seenId = new Set();
+        custom.customBills = custom.customBills.filter(cb => {
+            const id = String(cb?.id || "");
+            if (!id) return false;
+            if (seenId.has(id)) return false;
+            seenId.add(id);
+            return true;
+        });
+
+        return custom;
+    }
+
+    // -----------------------------
+    // ASSIGNMENT LOGIC (dropdown assign)
+    // -----------------------------
+    function sortLaneAssignmentsByDueDate(assignments, paycheckDate, BILLS) {
+        const ids = assignments[paycheckDate] || [];
+        ids.sort((idA, idB) => {
+            const a = billById(BILLS, idA);
+            const b = billById(BILLS, idB);
+            const da = a ? parseBillDate(a) : new Date(8640000000000000);
+            const db = b ? parseBillDate(b) : new Date(8640000000000000);
+            return da - db;
+
+        });
+        assignments[paycheckDate] = ids;
+    }
+
+    function assignBillToPaycheck(billId, paycheckDate) {
+        const BILLS = normalizeBills();
+        const assignments = loadAssignments();
+
+        for (const k of Object.keys(assignments)) {
+            assignments[k] = (assignments[k] || []).filter(x => String(x) !== String(billId));
+        }
+
+        assignments[paycheckDate] = assignments[paycheckDate] || [];
+        assignments[paycheckDate].push(billId);
+
+        sortLaneAssignmentsByDueDate(assignments, paycheckDate, BILLS);
+        saveAssignments(assignments);
+        render();
+    }
+
+    function clearLane(paycheckDate) {
+        const assignments = loadAssignments();
+        assignments[paycheckDate] = [];
+        saveAssignments(assignments);
+        render();
+    }
+
+    function autoAssignToLane(paycheckDate) {
+        const BILLS = normalizeBills();
+
+        const idx = PAYCHECKS.indexOf(paycheckDate);
+        const nextDate = PAYCHECKS[idx + 1] || null;
+
+        const assignments = loadAssignments();
+        assignments[paycheckDate] = assignments[paycheckDate] || [];
+
+        const alreadyAssigned = new Set();
+        for (const k of Object.keys(assignments)) {
+            (assignments[k] || []).forEach(id => alreadyAssigned.add(String(id)));
+        }
+
+        const cutoff = nextDate ? new Date(nextDate) : null;
+        const laneDate = new Date(paycheckDate);
+
+        const candidates = BILLS.filter(b => {
+            if (String(b.status || "").toLowerCase() === "paid") return false;
+            const due = new Date(b.due_date);
+            if (alreadyAssigned.has(String(b.id))) return false;
+
+            if (cutoff) return due >= laneDate && due < cutoff;
+
+            const end = new Date(laneDate);
+            end.setDate(end.getDate() + 13);
+            return due >= laneDate && due <= end;
+        });
+
+        candidates.forEach(b => assignments[paycheckDate].push(b.id));
+
+        sortLaneAssignmentsByDueDate(assignments, paycheckDate, BILLS);
+        saveAssignments(assignments);
+        render();
+    }
+
+    // -----------------------------
+    // PLANNER HEALTH SUMMARY
+    // -----------------------------
+    function jumpToFirstMonthLane() {
+        const firstLane = PAYCHECKS?.[0];
+        if (!firstLane) return;
+    
+        ensureLaneVisible(firstLane);
+    
+        const laneEl = document.querySelector(`.paycheck-lane[data-paycheck="${firstLane}"]`);
+        if (!laneEl) return;
+    
+        laneEl.classList.add("pp-flash");
+        setTimeout(() => laneEl.classList.remove("pp-flash"), 900);
+    }
+    
+    
+    function updatePlannerHealth({ BILLS, assignments, assignedSet, laneStats }) {
+        const firstLane = PAYCHECKS[0];
+        const firstD = new Date(firstLane);
+        const targetMonth = firstD.getMonth();
+        const targetYear = firstD.getFullYear();
+
+        // ✅ Set dynamic Mortgage label month/year (e.g., Jan 2026)
+        const monthLabel = firstD.toLocaleDateString(undefined, {
+            month: "short",
+            year: "numeric"
+        });
+        const mortgageIconEl = document.getElementById("healthMortgageIcon");
+        const mortgageLabelEl = document.getElementById("healthMortgageLabel");
+        const mortgageLabelTextEl = document.getElementById("healthMortgageLabelText");
+        
+        if (mortgageLabelTextEl) {
+            mortgageLabelTextEl.textContent = `Mortgage Covered (${monthLabel})`;
+        }
+        
+        if (mortgageLabelEl && !mortgageLabelEl.dataset.bound) {
+            mortgageLabelEl.dataset.bound = "1";
+        
+            mortgageLabelEl.addEventListener("click", jumpToFirstMonthLane);
+        
+            mortgageLabelEl.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    jumpToFirstMonthLane();
+                }
+            });
+        }
+    
+        const mortgageBills = BILLS.filter(isMortgageBill);
+    
+        // IMPORTANT: when a mortgage is split, the original mortgage bill may be "hidden"
+        // from BILLS (because it’s removed from the UI), but we still need its FULL amount
+        // for the health check. So we always compute against the "root" mortgage from SERVER_BILLS.
+        const serverMortgageBills = (SERVER_BILLS || []).filter(isMortgageBill);
+    
+        // Root mortgage bill (prefer one that matches the target month/year)
+// Root mortgage bill (prefer one that matches the target month/year)
+let mortgageRoot =
+    serverMortgageBills.find(b => {
+        const d = new Date(b.due_date);
+        return d.getMonth() === targetMonth && d.getFullYear() === targetYear;
+    }) || serverMortgageBills[0] || null;
+
+// ✅ NEW (FIXED): Only treat an assigned split as a "mortgage split"
+// if the ORIGINAL/root bill is actually a mortgage bill.
+// This prevents Taxes/Loans splits from flipping Mortgage Covered to Yes.
+let rootIdFromAssignedSplit = null;
+
+for (const lane of Object.keys(assignments || {})) {
+    for (const id of (assignments[lane] || [])) {
+        const b =
+            billById(BILLS, id) ||
+            billById((SERVER_BILLS || []), id);
+
+        if (!b) continue;
+
+        const meta = b.meta || {};
+        const metaType = String(meta.type || "").toLowerCase();
+
+        if (metaType === "mortgage_split") {
+            const originalId =
+                meta.originalId ?? meta.originalID ?? meta.original_id ?? meta.sourceId ?? meta.source_id;
+
+            if (!originalId) continue;
+
+            // Look up the ORIGINAL/root bill and confirm it's actually a mortgage
+            const rootCandidate =
+                billById((SERVER_BILLS || []), String(originalId)) ||
+                billById(BILLS, String(originalId));
+
+            if (rootCandidate && isMortgageBill(rootCandidate)) {
+                rootIdFromAssignedSplit = String(originalId);
+                break;
+            }
+        }
+    }
+    if (rootIdFromAssignedSplit) break;
+}
+
+if (rootIdFromAssignedSplit) {
+    // Try to find that root in SERVER_BILLS first (preferred)
+    mortgageRoot =
+        billById((SERVER_BILLS || []), rootIdFromAssignedSplit) ||
+        billById(BILLS, rootIdFromAssignedSplit) ||
+        mortgageRoot;
+}
+
+    
+        // Display mortgage (if the original isn't hidden, it may still exist in BILLS)
+        let mortgage =
+            mortgageBills.find(b => {
+                const d = new Date(b.due_date);
+                return d.getMonth() === targetMonth && d.getFullYear() === targetYear;
+            }) || mortgageBills[0] || mortgageRoot || null;
+    
+        let mortgageCovered = false;
+        let mortgageNote = "";
+    
+        if (mortgageRoot) {
+            const rootId = String(mortgageRoot.id);
+            const mAmt = Number(mortgageRoot.amount || 0);
+            let coveredSum = 0;
+    
+            // ✅ Sum assigned mortgage value across all lanes
+            for (const lane of Object.keys(assignments || {})) {
+                (assignments[lane] || []).forEach(id => {
+                    // Split pieces may not be in the current UI BILLS array, so fall back to SERVER_BILLS too
+                    const b =
+                        billById(BILLS, id) ||
+                        billById((SERVER_BILLS || []), id);
+    
+                    if (!b) return;
+    
+                    const bId = String(b.id);
+    
+                    // If the original mortgage bill is assigned (only possible if not hidden)
+                    if (bId === rootId) {
+                        coveredSum += Number(b.amount || 0);
+                        return;
+                    }
+    
+                    // If split pieces are assigned
+                    const meta = b.meta || {};
+                    const metaType = String(meta.type || "").toLowerCase();
+    
+                    const originalId =
+                        meta.originalId ?? meta.originalID ?? meta.original_id ?? meta.sourceId ?? meta.source_id;
+    
+                    if (metaType === "mortgage_split" && String(originalId) === rootId) {
+                        coveredSum += Number(b.amount || 0);
+                    }
+                });
+            }
+    
+            mortgageCovered = coveredSum >= (mAmt - 0.01);
+            mortgageNote = mortgageCovered
+                ? `Covered: ${money(coveredSum)} of ${money(mAmt)}`
+                : `Assigned: ${money(coveredSum)} of ${money(mAmt)}`;
+        } else {
+            mortgageNote = "No mortgage bill found yet.";
+        }
+    
+        // -----------------------------
+        // Overdue unassigned
+        // -----------------------------
+        const today = new Date(TODAY_STR + "T00:00:00");
+        const overdueUnassigned = (BILLS || []).filter(b => {
+            if (String(b.status || "").toLowerCase() === "paid") return false;
+            const due = new Date(b.due_date + "T00:00:00");
+            if (!(due < today)) return false;
+            if (assignedSet && assignedSet.has(String(b.id))) return false;
+            return true;
+        });
+    
+        const overdueCount = overdueUnassigned.length;
+        const overdueSum = overdueUnassigned.reduce((s, b) => s + Number(b.amount || 0), 0);
+    
+        // -----------------------------
+        // Lane stats (most loaded / lowest buffer)
+        // -----------------------------
+        const safeLaneStats = (laneStats || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+        const hottest = safeLaneStats.reduce((best, cur) => (cur.pct > (best?.pct ?? -1) ? cur : best), null);
+        const lowest  = safeLaneStats.reduce((best, cur) => (cur.left < (best?.left ?? Infinity) ? cur : best), null);
+    
+        const setCard = (cardId, ok) => {
+            const el = document.getElementById(cardId);
+            if (!el) return;
+            el.classList.toggle("pp-health-ok", !!ok);
+            el.classList.toggle("pp-health-warn", !ok);
+        };
+    
+        // -----------------------------
+        // Write UI
+        // -----------------------------
+        document.getElementById("healthMortgageValue").textContent =
+            mortgage ? (mortgageCovered ? "✅ Yes" : "⚠️ Not yet") : "—";
+        document.getElementById("healthMortgageNote").textContent = mortgageNote;
+        setCard("healthMortgageCard", mortgageCovered);
+
+        // ✅ Swap icon in the LABEL itself (✅ / ⚠️ / —)
+        if (mortgageIconEl) {
+            mortgageIconEl.textContent = mortgage
+                ? (mortgageCovered ? "✅" : "⚠️")
+                : "—";
+        }
+
+    
+        document.getElementById("healthOverdueValue").textContent =
+            overdueCount > 0 ? `${overdueCount} (${money(overdueSum)})` : "✅ None";
+        document.getElementById("healthOverdueNote").textContent =
+            overdueCount > 0 ? "Assign these first to avoid late fees." : "Nice — everything overdue is handled.";
+        setCard("healthOverdueCard", overdueCount === 0);
+    
+        if (hottest) {
+            const hotLabel = new Date(hottest.date).toLocaleDateString(undefined, { month:"short", day:"2-digit" });
+            const pct = Math.round(hottest.pct);
+            document.getElementById("healthHotLaneValue").textContent = `${hotLabel} at ${pct}%`;
+            document.getElementById("healthHotLaneNote").textContent = `${money(hottest.total)} assigned of ${money(PAYCHECK_AMOUNT)}`;
+            setCard("healthHotLaneCard", pct < 90);
+        } else {
+            document.getElementById("healthHotLaneValue").textContent = "—";
+            document.getElementById("healthHotLaneNote").textContent = "";
+            setCard("healthHotLaneCard", true);
+        }
+    
+        if (lowest) {
+            const lowLabel = new Date(lowest.date).toLocaleDateString(undefined, { month:"short", day:"2-digit" });
+            document.getElementById("healthLowestBufferValue").textContent = money(lowest.left);
+            document.getElementById("healthLowestBufferNote").textContent = `Lowest buffer is on ${lowLabel}`;
+            setCard("healthLowestBufferCard", lowest.left >= 0);
+        } else {
+            document.getElementById("healthLowestBufferValue").textContent = "—";
+            document.getElementById("healthLowestBufferNote").textContent = "";
+            setCard("healthLowestBufferCard", true);
+        }
+    }
+    
+    // -----------------------------
+// BULK ASSIGN
+// -----------------------------
+function parseBillDate(b) {
+    // Prefer ISO date fields first
+    const raw =
+        b?.due_date ||
+        b?.dueDate ||
+        b?.due ||
+        b?.first_due ||
+        "";
+
+    // Case 1: ISO "YYYY-MM-DD" (or starts with it)
+    if (typeof raw === "string" && /^\d{4}-\d{2}-\d{2}/.test(raw)) {
+        const iso = raw.slice(0, 10); // keep YYYY-MM-DD
+        const d = new Date(iso + "T00:00:00"); // local midnight, stable
+        if (!isNaN(d)) return d;
+    }
+
+    // Case 2: due_label like "Jan 02" or "Jan 02, 2026"
+    const label = String(b?.due_label || "").trim();
+    if (label) {
+        const year = Number(String(TODAY_STR || "").slice(0, 4)) || new Date().getFullYear();
+
+        // "Jan 02" OR "Jan 02, 2026"
+        const m = label.match(/^([A-Za-z]{3,})\s+(\d{1,2})(?:,\s*(\d{4}))?$/);
+        if (m) {
+            const monStr = m[1].slice(0, 3).toLowerCase();
+            const day = Number(m[2]);
+            const y = Number(m[3] || year);
+
+            const monthMap = { jan:0, feb:1, mar:2, apr:3, may:4, jun:5, jul:6, aug:7, sep:8, oct:9, nov:10, dec:11 };
+            const month = monthMap[monStr];
+
+            if (month !== undefined && day >= 1 && day <= 31) {
+                return new Date(y, month, day, 0, 0, 0, 0); // local date
+            }
+        }
+    }
+
+    // Fallback: push unknowns to the end
+    return new Date(8640000000000000);
+}
+
+function billSortDate(b) {
+    return parseBillDate(b);
+}
+
+
+function getUnassignedVisibleBills(BILLS, assignedSet) {
+    // ✅ Only show items that are NOT assigned AND NOT Paid
+    const rows = (BILLS || []).filter(b => {
+        if (assignedSet.has(String(b.id))) return false;
+        const status = (b.status || "Unpaid");
+        return status !== "Paid";
+    });
+
+    // ✅ Sort by due date (then by name to keep ordering stable)
+    rows.sort((a, b) => {
+        const da = billSortDate(a);
+        const db = billSortDate(b);
+        if (da - db !== 0) return da - db;
+        return String(a.name || "").localeCompare(String(b.name || ""));
+    });
+
+    return rows;
+}
+
+
+function updateBulkBarState(visibleUnassigned) {
+    const countEl = document.getElementById("ppBulkCount");
+    const bulkBtn = document.getElementById("ppBulkAssignBtn");
+    const clearBtn = document.getElementById("ppBulkClearBtn");
+    const selectAll = document.getElementById("ppSelectAllUnassigned");
+
+    const selectedCount = SELECTED_UNASSIGNED.size;
+
+    if (countEl) countEl.textContent = `${selectedCount} selected`;
+    if (bulkBtn) bulkBtn.disabled = selectedCount === 0;
+    if (clearBtn) clearBtn.disabled = selectedCount === 0;
+
+    // Select-all checkbox state (only for currently visible unassigned)
+    if (selectAll) {
+        const visibleIds = new Set((visibleUnassigned || []).map(b => String(b.id)));
+        let visibleSelected = 0;
+        visibleIds.forEach(id => { if (SELECTED_UNASSIGNED.has(id)) visibleSelected++; });
+
+        selectAll.checked = visibleIds.size > 0 && visibleSelected === visibleIds.size;
+        selectAll.indeterminate = visibleSelected > 0 && visibleSelected < visibleIds.size;
+    }
+}
+
+function buildBulkPaycheckOptionsHTML(selectedValue = "") {
+    const leftMap = getLaneLeftMap();
+
+    return `
+        <option value="">Select paycheck…</option>
+        ${PAYCHECKS.map(pd => {
+            const leftText = leftMap[pd] || "$0.00";
+            const labelDate = formatPaycheckLabel(pd);
+            const selected = String(selectedValue) === String(pd) ? "selected" : "";
+            return `<option value="${pd}" ${selected}>${labelDate} (Left: ${leftText})</option>`;
+        }).join("")}
+    `;
+}
+
+function refreshBulkPaycheckSelect() {
+    const sel = document.getElementById("ppBulkPaycheckSelect");
+    if (!sel) return;
+    const current = sel.value;
+    sel.innerHTML = buildBulkPaycheckOptionsHTML(current);
+}
+
+function clearBulkSelection() {
+    SELECTED_UNASSIGNED = new Set();
+    render();
+}
+
+function bulkAssignSelectedTo(paycheckDate) {
+    if (!paycheckDate) return;
+
+    const BILLS = normalizeBills();
+    const assignments = loadAssignments();
+
+    // Remove selected IDs from ALL lanes first
+    for (const lane of Object.keys(assignments)) {
+        assignments[lane] = (assignments[lane] || []).filter(id => !SELECTED_UNASSIGNED.has(String(id)));
+    }
+
+    // Add all selected to target lane
+    assignments[paycheckDate] = assignments[paycheckDate] || [];
+    SELECTED_UNASSIGNED.forEach(id => {
+        if (!assignments[paycheckDate].some(x => String(x) === String(id))) {
+            assignments[paycheckDate].push(id);
+        }
+    });
+
+    sortLaneAssignmentsByDueDate(assignments, paycheckDate, BILLS);
+    saveAssignments(assignments);
+
+    // Clear selection after assign
+    SELECTED_UNASSIGNED = new Set();
+
+    render();
+
+    ensureLaneVisible(paycheckDate);
+
+    const lane = document.querySelector(`.paycheck-lane[data-paycheck="${paycheckDate}"]`);
+    lane?.classList.add("pp-flash");
+    setTimeout(() => lane?.classList.remove("pp-flash"), 700);
+
+}
+
+function bindBulkBarEvents() {
+    const selectAll = document.getElementById("ppSelectAllUnassigned");
+    const bulkAssignBtn = document.getElementById("ppBulkAssignBtn");
+    const bulkClearBtn = document.getElementById("ppBulkClearBtn");
+    const bulkPaySel = document.getElementById("ppBulkPaycheckSelect");
+
+    if (selectAll && !selectAll.dataset.bound) {
+        selectAll.dataset.bound = "1";
+        selectAll.addEventListener("change", () => {
+            // Toggle ONLY the currently visible unassigned checkboxes
+            document.querySelectorAll('input.pp-row-check[data-bill-id]').forEach(cb => {
+                cb.checked = selectAll.checked;
+                const id = String(cb.dataset.billId);
+                if (selectAll.checked) SELECTED_UNASSIGNED.add(id);
+                else SELECTED_UNASSIGNED.delete(id);
+            });
+            // State refresh
+            const BILLS = normalizeBills();
+            const assignments = loadAssignments();
+            const assignedSet = new Set();
+            Object.values(assignments).forEach(arr => (arr || []).forEach(id => assignedSet.add(String(id))));
+            updateBulkBarState(getUnassignedVisibleBills(BILLS, assignedSet));
+        });
+    }
+
+    if (bulkAssignBtn && !bulkAssignBtn.dataset.bound) {
+        bulkAssignBtn.dataset.bound = "1";
+        bulkAssignBtn.addEventListener("click", () => {
+            const target = bulkPaySel?.value || "";
+            if (!target) return;
+            bulkAssignSelectedTo(target);
+        });
+    }
+
+    if (bulkClearBtn && !bulkClearBtn.dataset.bound) {
+        bulkClearBtn.dataset.bound = "1";
+        bulkClearBtn.addEventListener("click", clearBulkSelection);
+    }
+
+    if (bulkPaySel && !bulkPaySel.dataset.bound) {
+        bulkPaySel.dataset.bound = "1";
+        // Keep “Left: $X” live when user opens/focuses
+        bulkPaySel.addEventListener("focus", refreshBulkPaycheckSelect);
+        bulkPaySel.addEventListener("mousedown", refreshBulkPaycheckSelect);
+    }
+}
+
+
+    // -----------------------------
+    // RENDER UI
+    // -----------------------------
+    function render() {
+        const BILLS = normalizeBills();
+        const assignments = loadAssignments();
+
+        document.querySelectorAll(".lane-items").forEach(el => el.innerHTML = "");
+
+        const assignedSet = new Set();
+        Object.values(assignments).forEach(arr => (arr || []).forEach(id => assignedSet.add(String(id))));
+
+        const laneStats = [];
+
+        PAYCHECKS.forEach(pd => {
+            const lane = document.querySelector(`.paycheck-lane[data-paycheck="${pd}"]`);
+            if (!lane) return;
+
+            const itemsWrap = lane.querySelector(".lane-items");
+            const ids = assignments[pd] || [];
+
+            const sortedIds = [...ids].sort((idA, idB) => {
+                const a = billById(BILLS, idA);
+                const b = billById(BILLS, idB);
+                const da = a ? parseBillDate(a) : new Date(8640000000000000);
+                const db = b ? parseBillDate(b) : new Date(8640000000000000);
+                return da - db;
+
+            });
+
+            let total = 0;
+
+            sortedIds.forEach(id => {
+                const b = billById(BILLS, id);
+                if (!b) return;
+
+                total += Number(b.amount || 0);
+
+                const chip = document.createElement("div");
+                chip.className = "lane-bill-card";
+
+                const statusRaw = String(b.status || "Unpaid").trim();
+const isPaid = statusRaw.toLowerCase() === "paid";
+
+chip.classList.toggle("is-paid", isPaid);
+
+const statusText = isPaid ? "Paid" : "Not paid";
+const statusIcon = isPaid ? "✅" : "⏳";
+const statusClass = isPaid ? "lane-status-paid" : "lane-status-unpaid";
+
+            chip.innerHTML = `
+                <div style="min-width:0;">
+                    <div class="lane-bill-title">${escapeHtml(b.name)}</div>
+                    <div class="lane-bill-sub">Due ${escapeHtml(b.due_label)} • ${escapeHtml(b.category || "")}</div>
+
+                    <div class="lane-bill-meta">
+                        <span class="lane-status-badge ${statusClass}">
+                            ${statusIcon} ${escapeHtml(statusText)}
+                        </span>
+
+                        <span class="lane-autopay">
+                            AutoPay: <strong>${escapeHtml(b.autopay || "✖")}</strong>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="lane-bill-right">
+                    <div class="lane-bill-amount">${money(b.amount)}</div>
+                    <button type="button" class="pro-btn pp-btn-compact"
+                            data-remove="${escapeHtml(b.id)}" data-from="${pd}">
+                        Remove
+                    </button>
+                </div>
+            `;
+
+                itemsWrap.appendChild(chip);
+            });
+
+            if (sortedIds.length === 0) {
+                const empty = document.createElement("div");
+                empty.style.color = "#666";
+                empty.style.fontWeight = "700";
+                empty.style.padding = "8px";
+                empty.textContent = "No bills assigned yet.";
+                itemsWrap.appendChild(empty);
+            }
+
+            const left = PAYCHECK_AMOUNT - total;
+            lane.querySelector(".lane-total").textContent = money(total);
+            lane.querySelector(".lane-left").textContent = money(left);
+
+            // NEW: inline pill indicators + subtle lane state (no harsh border)
+            const pctUsed = PAYCHECK_AMOUNT > 0 ? (total / PAYCHECK_AMOUNT) * 100 : 0;
+
+            // Clear state classes first
+            lane.classList.remove("lane-negative", "lane-nearfull");
+
+            // Grab pill elements
+            const negativePill = lane.querySelector('[data-lane-pill="negative"]');
+            const nearfullPill = lane.querySelector('[data-lane-pill="nearfull"]');
+
+            // Defaults: hide pills
+            if (negativePill) negativePill.hidden = true;
+            if (nearfullPill) nearfullPill.hidden = true;
+
+            // NEGATIVE (over budget)
+            if (left < 0) {
+                lane.classList.add("lane-negative");
+                if (negativePill) {
+                    negativePill.hidden = false;
+                    negativePill.textContent = `Over budget: ${money(Math.abs(left))}`;
+                }
+            }
+            // NEARLY FULL (85–90%+) but not negative yet
+            else if (pctUsed >= 85) {
+                lane.classList.add("lane-nearfull");
+                if (nearfullPill) {
+                    nearfullPill.hidden = false;
+
+                    // Optional: make it more informative
+                    const pctLabel = Math.round(pctUsed);
+                    nearfullPill.textContent = `Nearly full: ${pctLabel}%`;
+                }
+            }
+
+
+            laneStats.push({
+                date: pd,
+                total,
+                left,
+                pct: PAYCHECK_AMOUNT > 0 ? (total / PAYCHECK_AMOUNT) * 100 : 0
+            });
+        });
+
+        document.querySelectorAll("button[data-remove]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const billId = btn.getAttribute("data-remove");
+                const from = btn.getAttribute("data-from");
+        
+                // 1) Remove this item from the lane
+                const a = loadAssignments();
+                a[from] = (a[from] || []).filter(x => String(x) !== String(billId));
+                saveAssignments(a);
+        
+                // 2) If this was a split item, and it was the LAST split remaining,
+                //    automatically restore the original bill (unhide it + remove custom splits)
+                const BILLS = normalizeBills();
+                const removedBill = billById(BILLS, billId);
+        
+                if (removedBill?.meta?.type === "mortgage_split" && removedBill?.meta?.originalId) {
+                    const originalId = String(removedBill.meta.originalId);
+                    const splitPrefix = `mortgage_split_${originalId}_`;
+        
+                    // Check if ANY split pieces for this originalId are still assigned anywhere
+                    const a2 = loadAssignments();
+                    let stillAssigned = false;
+        
+                    for (const k of Object.keys(a2)) {
+                        if ((a2[k] || []).some(x => String(x).startsWith(splitPrefix))) {
+                            stillAssigned = true;
+                            break;
+                        }
+                    }
+        
+                    // If none are assigned, restore the original bill so it can be split again
+                    if (!stillAssigned) {
+                        undoMortgageSplits(originalId); // this saves + renders internally
+                        return;
+                    }
+                }
+        
+                // Default refresh
+                render();
+            });
+        });
+        
+
+        // UNASSIGNED TABLE
+        const tbody = document.getElementById("unassignedTbody");
+        tbody.innerHTML = "";
+
+        const unassigned = getUnassignedVisibleBills(BILLS, assignedSet);
+
+
+        unassigned.forEach(b => {
+            const tr = document.createElement("tr");
+            const isChecked = SELECTED_UNASSIGNED.has(String(b.id));
+
+
+    
+            tr.innerHTML = `
+                <td class="pp-checkcell">
+                    <input type="checkbox"
+                            class="pp-row-check"
+                            data-bill-id="${escapeHtml(b.id)}"
+                            ${isChecked ? "checked" : ""} />
+                </td>
+                <td class="pp-ellipsis">${escapeHtml(b.name)}</td>
+                <td>${escapeHtml(b.due_label)}</td>
+                <td class="pp-ellipsis">${escapeHtml(b.category || "")}</td>
+                <td class="money">${money(b.amount)}</td>
+                <td>${escapeHtml(b.status || "Unpaid")}</td>
+                <td class="pp-autopay-cell">${escapeHtml(b.autopay || "✖")}</td>
+                <td class="pp-assign-td">
+                    <div class="pp-assign-cell">
+                        <select class="pp-assign-select" aria-label="Select paycheck to assign"></select>
+                        <button type="button"
+                                class="pro-btn pp-btn-compact pp-assign-btn"
+                                aria-label="Assign bill to selected paycheck">
+                            Assign
+                        </button>
+                    </div>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+            // Checkbox behavior (bulk selection)
+            const cb = tr.querySelector(".pp-row-check");
+            cb.addEventListener("change", () => {
+                const id = String(cb.dataset.billId);
+                if (cb.checked) SELECTED_UNASSIGNED.add(id);
+                else SELECTED_UNASSIGNED.delete(id);
+
+                updateBulkBarState(unassigned);
+            });
+
+            const sel = tr.querySelector(".pp-assign-select");
+            // Build options including live "Left: $X"
+            refreshAssignSelect(sel);
+
+            // Update “Left: $X” LIVE whenever user opens/focuses the dropdown
+            sel.addEventListener("focus", () => refreshAssignSelect(sel));
+            sel.addEventListener("mousedown", () => refreshAssignSelect(sel)); // catches click-open on most browsers
+
+            const btn = tr.querySelector(".pp-assign-btn");
+            btn.addEventListener("click", () => {
+                const paycheckDate = sel.value;
+                if (!paycheckDate) return;
+
+                assignBillToPaycheck(b.id, paycheckDate);
+
+                ensureLaneVisible(paycheckDate);
+
+                const lane = document.querySelector(`.paycheck-lane[data-paycheck="${paycheckDate}"]`);
+                lane?.classList.add("pp-flash");
+                setTimeout(() => lane?.classList.remove("pp-flash"), 700);
+
+            });
+        });
+
+        // HEALTH SUMMARY
+        updatePlannerHealth({ BILLS, assignments, assignedSet, laneStats });
+
+        // Bulk bar updates
+        refreshBulkPaycheckSelect();
+        bindBulkBarEvents();
+
+        // Remove selections that are no longer visible (assigned/hidden)
+        const visibleUnassigned = getUnassignedVisibleBills(BILLS, assignedSet);
+        const visibleIdSet = new Set(visibleUnassigned.map(b => String(b.id)));
+        SELECTED_UNASSIGNED.forEach(id => {
+            if (!visibleIdSet.has(String(id))) SELECTED_UNASSIGNED.delete(String(id));
+        });
+        updateBulkBarState(visibleUnassigned);
+
+        updateLanePager();
+
+
+    }
+
+// -----------------------------
+// INIT
+// -----------------------------
+function init() {
+    // -----------------------------
+    // Start Paycheck dropdown (for splitting) + used elsewhere
+    // -----------------------------
+    const mortgageStartPaycheck = document.getElementById("mortgageStartPaycheck");
+    if (mortgageStartPaycheck) {
+        mortgageStartPaycheck.innerHTML = "";
+        PAYCHECKS.forEach(pd => {
+            const opt = document.createElement("option");
+            opt.value = pd;
+            opt.textContent = formatPaycheckLabel(pd);
+            mortgageStartPaycheck.appendChild(opt);
+        });
+    }
+
+    // -----------------------------
+    // Better Split Helper: Bill Name -> Due Date
+    // -----------------------------
+    const billNameSel = document.getElementById("splitBillNameSelect");
+    const dueSel = document.getElementById("splitBillDueSelect");
+    const splitBtn = document.getElementById("btnSplitMortgage");
+    const undoBtn = document.getElementById("btnUndoMortgageSplit");
+
+    // Build index of bill-name -> occurrences
+    const splitIndex = buildSplitBillIndex();
+
+    function populateBillNames() {
+        if (!billNameSel) return;
+
+        billNameSel.innerHTML = "";
+
+        const keys = Object.keys(splitIndex);
+
+        if (keys.length === 0) {
+            const o = document.createElement("option");
+            o.value = "";
+            o.textContent = "No splittable bills found (Rent/Mortgage, Loans, Taxes)";
+            billNameSel.appendChild(o);
+
+            if (dueSel) {
+                dueSel.innerHTML = "";
+                dueSel.disabled = true;
+            }
+            if (splitBtn) splitBtn.disabled = true;
+            if (undoBtn) undoBtn.disabled = true;
+            return;
+        }
+
+        // Sort by display name
+        keys.sort((a, b) => {
+            const A = splitIndex[a]?.nameLabel || "";
+            const B = splitIndex[b]?.nameLabel || "";
+            return A.localeCompare(B);
+        });
+
+        // Add a placeholder
+        const ph = document.createElement("option");
+        ph.value = "";
+        ph.textContent = "Select a bill name…";
+        billNameSel.appendChild(ph);
+
+        keys.forEach(key => {
+            const group = splitIndex[key];
+            const o = document.createElement("option");
+            o.value = key;
+            o.textContent = group.nameLabel;
+            billNameSel.appendChild(o);
+        });
+    }
+
+    function populateDueDatesForSelectedBill() {
+        if (!billNameSel || !dueSel) return;
+
+        const key = billNameSel.value;
+
+        dueSel.innerHTML = "";
+
+        if (!key || !splitIndex[key]) {
+            dueSel.disabled = true;
+
+            const o = document.createElement("option");
+            o.value = "";
+            o.textContent = "Pick a bill name first…";
+            dueSel.appendChild(o);
+
+            if (splitBtn) splitBtn.disabled = true;
+            if (undoBtn) undoBtn.disabled = true;
+            return;
+        }
+
+        const items = splitIndex[key].items || [];
+
+        // Placeholder
+        const ph = document.createElement("option");
+        ph.value = "";
+        ph.textContent = "Select which due date to split…";
+        dueSel.appendChild(ph);
+
+        items.forEach(b => {
+            const o = document.createElement("option");
+            o.value = String(b.id); // IMPORTANT: due occurrence id
+            o.textContent = formatDueOption(b);
+            dueSel.appendChild(o);
+        });
+
+        dueSel.disabled = false;
+
+        if (splitBtn) splitBtn.disabled = true;  // only enable after due is picked
+        if (undoBtn) undoBtn.disabled = true;
+
+        setSplitMsg("");
+    }
+
+    function onDueSelectedAutoPickStartPaycheck() {
+        if (!dueSel || !mortgageStartPaycheck) return;
+
+        const occId = dueSel.value;
+        if (!occId) {
+            if (splitBtn) splitBtn.disabled = true;
+            if (undoBtn) undoBtn.disabled = true;
+            return;
+        }
+
+        const occ = billById((SERVER_BILLS || []), occId);
+        if (!occ) return;
+
+        // Auto-pick the closest paycheck on/before due date
+        const suggestedStart = getClosestPaycheckOnOrBefore(occ.due_date);
+        if (suggestedStart) mortgageStartPaycheck.value = suggestedStart;
+
+        if (splitBtn) splitBtn.disabled = false;
+        if (undoBtn) undoBtn.disabled = false;
+    }
+
+    // Initial fill
+    populateBillNames();
+    populateDueDatesForSelectedBill();
+
+    // Bind selection changes
+    if (billNameSel && !billNameSel.dataset.bound) {
+        billNameSel.dataset.bound = "1";
+        billNameSel.addEventListener("change", () => {
+            populateDueDatesForSelectedBill();
+        });
+    }
+
+    if (dueSel && !dueSel.dataset.bound) {
+        dueSel.dataset.bound = "1";
+        dueSel.addEventListener("change", () => {
+            onDueSelectedAutoPickStartPaycheck();
+        });
+    }
+
+    // -----------------------------
+    // Split button
+    // -----------------------------
+    if (splitBtn && !splitBtn.dataset.bound) {
+        splitBtn.dataset.bound = "1";
+        splitBtn.addEventListener("click", () => {
+            setSplitMsg("");
+
+            const occId = dueSel?.value || "";
+            if (!occId) {
+                setSplitMsg("Please choose a due date first.", false);
+                return;
+            }
+
+            const splitCount = document.getElementById("mortgageSplitCount")?.value || "3";
+            const startPaycheck = document.getElementById("mortgageStartPaycheck")?.value || "";
+
+            if (!startPaycheck) {
+                setSplitMsg("Please choose a start paycheck.", false);
+                return;
+            }
+
+            // IMPORTANT: we split the selected due occurrence id
+            const result = createMortgageSplits({
+                mortgageBillId: occId,
+                splitCount,
+                startPaycheck
+            });
+
+            setSplitMsg(result.msg, result.ok);
+
+            render();
+
+            if (result.ok && startPaycheck) {
+                ensureLaneVisible(startPaycheck);
+                const lane = document.querySelector(`.paycheck-lane[data-paycheck="${startPaycheck}"]`);
+                lane?.classList.add("pp-flash");
+                setTimeout(() => lane?.classList.remove("pp-flash"), 700);
+            }
+        });
+    }
+
+    // -----------------------------
+    // Undo button (undo for the selected due occurrence)
+    // -----------------------------
+    if (undoBtn && !undoBtn.dataset.bound) {
+        undoBtn.dataset.bound = "1";
+        undoBtn.addEventListener("click", () => {
+            setSplitMsg("");
+
+            const occId = dueSel?.value || "";
+            if (!occId) {
+                setSplitMsg("Please choose a due date first.", false);
+                return;
+            }
+
+            const result = undoMortgageSplits(occId);
+            setSplitMsg(result.msg, result.ok);
+
+            render();
+        });
+    }
+
+    // -----------------------------
+    // Existing global buttons (unchanged)
+    // -----------------------------
+    const autoAssignAllBtn = document.getElementById("btnAutoAssignAll");
+    if (autoAssignAllBtn && !autoAssignAllBtn.dataset.bound) {
+        autoAssignAllBtn.dataset.bound = "1";
+        autoAssignAllBtn.addEventListener("click", () => {
+            PAYCHECKS.forEach(pd => autoAssignToLane(pd));
+        });
+    }
+
+    const resetAllBtn = document.getElementById("btnResetAll");
+    if (resetAllBtn && !resetAllBtn.dataset.bound) {
+        resetAllBtn.dataset.bound = "1";
+        resetAllBtn.addEventListener("click", () => {
+            localStorage.removeItem(ASSIGN_KEY);
+            render();
+        });
+    }
+
+    document.querySelectorAll(".btn-clear-lane").forEach(btn => {
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = "1";
+        btn.addEventListener("click", () => clearLane(btn.dataset.paycheck));
+    });
+
+    document.querySelectorAll(".btn-auto-assign").forEach(btn => {
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = "1";
+        btn.addEventListener("click", () => autoAssignToLane(btn.dataset.paycheck));
+    });
+
+    // Lane pager buttons
+    const prevBtn = document.getElementById("ppPrevLanes");
+    const nextBtn = document.getElementById("ppNextLanes");
+
+    if (prevBtn && !prevBtn.dataset.bound) {
+        prevBtn.dataset.bound = "1";
+        prevBtn.addEventListener("click", () => setLanePage(LANE_PAGE - 1));
+    }
+    if (nextBtn && !nextBtn.dataset.bound) {
+        nextBtn.dataset.bound = "1";
+        nextBtn.addEventListener("click", () => setLanePage(LANE_PAGE + 1));
+    }
+
+    // First render
+    render();
+}
+
+    function getLaneLeftMap() {
+        const map = {};
+        PAYCHECKS.forEach(pd => {
+            const lane = document.querySelector(`.paycheck-lane[data-paycheck="${pd}"]`);
+            const leftText = lane?.querySelector(".lane-left")?.textContent || "$0.00";
+            map[pd] = leftText;
+        });
+        return map;
+    }
+
+    function buildAssignOptionsHTML(selectedValue = "") {
+        const leftMap = getLaneLeftMap();
+
+        return `
+            <option value="">Select paycheck…</option>
+            ${PAYCHECKS.map(pd => {
+                const leftText = leftMap[pd] || "$0.00";
+                const labelDate = formatPaycheckLabel(pd);
+                const selected = String(selectedValue) === String(pd) ? "selected" : "";
+                return `<option value="${pd}" ${selected}>${labelDate} (Left: ${leftText})</option>`;
+            }).join("")}
+        `;
+    }
+
+    function refreshAssignSelect(selectEl) {
+        if (!selectEl) return;
+        const current = selectEl.value;
+        selectEl.innerHTML = buildAssignOptionsHTML(current);
+    }
+
+    init();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if bill %}Edit Bill{% else %}Add Bill{% endif %}</title>
+    <link rel="stylesheet" href="/static/global.css">
+</head>
+
+<body>
+
+    <h1 class="page-title">
+        <span class="emoji">{{ '✏️' if bill else '➕' }}</span>
+        {{ 'Edit Bill' if bill else 'Add Bill' }}
+    </h1>
+
+    <div class="form-container-pro">
+
+        <form method="POST" class="pro-form-card two-column-form">
+
+            <!-- BILL NAME -->
+            <div class="form-field">
+                <label>📝 Bill Name</label>
+                <input type="text" name="name" required value="{{ bill.name if bill else '' }}">
+            </div>
+
+            <!-- AMOUNT -->
+            <div class="form-field">
+                <label>💵 Amount Due</label>
+                <input type="number" step="0.01" name="amount" required 
+                       value="{{ bill.amount if bill else '' }}">
+            </div>
+
+            <!-- CATEGORY BUTTON -->
+            <div class="form-field">
+                <label>📂 Category</label>
+                <input type="hidden" id="categoryInput" name="category" 
+                       value="{{ bill.category if bill else '' }}">
+                <button type="button" id="categoryBtn" class="category-select-btn"
+                        onclick="openCategoryModal()">
+                    {{ bill.category if bill else 'Choose Category' }}
+                </button>
+            </div>
+
+            <!-- RECURRENCE -->
+            <div class="form-field">
+                <label>🔁 Recurrence</label>
+                <select name="recurrence" id="recurrenceSelect" onchange="toggleCustomFields()" required>
+                    <option {% if bill and bill.recurrence=='One-Time' %}selected{% endif %}>One-Time</option>
+                    <option {% if bill and bill.recurrence=='Weekly' %}selected{% endif %}>Weekly</option>
+                    <option {% if bill and bill.recurrence=='Biweekly' %}selected{% endif %}>Biweekly</option>
+                    <option {% if bill and bill.recurrence=='Monthly' %}selected{% endif %}>Monthly</option>
+                    <option {% if bill and bill.recurrence=='Quarterly' %}selected{% endif %}>Quarterly</option>
+                    <option {% if bill and bill.recurrence=='Yearly' %}selected{% endif %}>Yearly</option>
+                    <option {% if bill and bill.recurrence=='Custom' %}selected{% endif %}>Custom</option>
+                </select>
+            </div>
+
+            <!-- FIRST DUE -->
+            <div class="form-field">
+                <label>📅 First Due Date</label>
+                <input type="date" name="first_due"
+                       value="{{ bill.first_due.strftime('%Y-%m-%d') if bill else '' }}"
+                       required>
+            </div>
+
+            <!-- CUSTOM FIELDS (Hidden unless Custom) -->
+            <div class="form-field customField">
+                <label>🔧 Custom Interval</label>
+                <input type="number" name="custom_interval"
+                       value="{{ bill.custom_interval if bill and bill.custom_interval else '' }}">
+            </div>
+
+            <div class="form-field customField">
+                <label>📏 Interval Unit</label>
+                <select name="custom_unit">
+                    <option value="days"    {% if bill and bill.custom_unit=='days' %}selected{% endif %}>Days</option>
+                    <option value="weeks"   {% if bill and bill.custom_unit=='weeks' %}selected{% endif %}>Weeks</option>
+                    <option value="months"  {% if bill and bill.custom_unit=='months' %}selected{% endif %}>Months</option>
+                </select>
+            </div>
+
+            <div class="form-field customField">
+                <label>🛑 Stop After # Occurrences</label>
+                <input type="number" name="end_after_occurrences"
+                       value="{{ bill.end_after_occurrences if bill and bill.end_after_occurrences else '' }}">
+            </div>
+
+            <!-- END DATE -->
+            <div class="form-field">
+                <label>📅 End Date (optional)</label>
+                <input type="date" name="end_date"
+                       value="{{ bill.end_date.strftime('%Y-%m-%d') if bill and bill.end_date else '' }}">
+            </div>
+
+            <!-- AUTO PAY -->
+            <div class="form-field">
+                <label>⚙ Auto Pay?</label>
+                <select name="auto_pay">
+                    <option value="False" {% if bill and not bill.auto_pay %}selected{% endif %}>No</option>
+                    <option value="True"  {% if bill and bill.auto_pay %}selected{% endif %}>Yes</option>
+                </select>
+            </div>
+
+            <!-- NOTES (full-width) -->
+            <div class="form-field-large form-full">
+                <label>🗒 Notes</label>
+                <textarea name="notes" rows="3">{{ bill.notes if bill and bill.notes else '' }}</textarea>
+            </div>
+
+            <!-- BUTTONS (full-width) -->
+            <div class="form-actions form-full">
+                <button class="pro-btn">💾 Save</button>
+                <a href="/bills" class="pro-btn cancel-btn">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+
+
+<!-- CATEGORY MODAL (unchanged) -->
+<div id="categoryModal" class="modal-overlay hidden">
+    <div class="modal-box category-pro-modal">
+
+        <h3>Select a Category</h3>
+
+        <div class="category-grid">
+
+            <div class="category-card" onclick="setCategory('Rent/Mortgage')">
+                <span class="cat-emoji">🏡</span>
+                <span class="cat-label">Rent/Mortgage</span>
+            </div>
+
+            <div class="category-card" onclick="setCategory('Utilities')">
+                <span class="cat-emoji">💡</span>
+                <span class="cat-label">Utilities</span>
+            </div>
+
+            <div class="category-card" onclick="setCategory('Home Expenses')">
+                <span class="cat-emoji">🏘️</span>
+                <span class="cat-label">Home Expenses</span>
+            </div>
+
+            <div class="category-card" onclick="setCategory('Credit Cards')">
+                <span class="cat-emoji">💳</span>
+                <span class="cat-label">Credit Cards</span>
+            </div>
+
+            <div class="category-card" onclick="setCategory('Installment Loans')">
+                <span class="cat-emoji">💰</span>
+                <span class="cat-label">Installment Loans</span>
+            </div>
+
+            <div class="category-card" onclick="setCategory('Loans')">
+                <span class="cat-emoji">💰</span>
+                <span class="cat-label">Loans</span>
+            </div>
+
+            <div class="category-card" onclick="setCategory('Taxes')">
+                <span class="cat-emoji">🏛️</span>
+                <span class="cat-label">Taxes</span>
+            </div>
+
+            <div class="category-card" onclick="setCategory('Insurance')">
+                <span class="cat-emoji">🛡</span>
+                <span class="cat-label">Insurance</span>
+            </div>
+
+            <div class="category-card" onclick="setCategory('Subscriptions')">
+                <span class="cat-emoji">📺</span>
+                <span class="cat-label">Subscriptions</span>
+            </div>
+
+            <div class="category-card" onclick="setCategory('Auto Services')">
+                <span class="cat-emoji">🚗</span>
+                <span class="cat-label">Auto Services</span>
+            </div>
+
+            <div class="category-card" onclick="setCategory('Misc')">
+                <span class="cat-emoji">🧾</span>
+                <span class="cat-label">Misc</span>
+            </div>
+
+        </div>
+
+        <button class="pro-btn cancel-btn close-modal-btn" onclick="closeCategoryModal()">Close</button>
+
+    </div>
+</div>
+
+
+<script>
+function openCategoryModal() {
+    document.getElementById("categoryModal").classList.remove("hidden");
+}
+
+function closeCategoryModal() {
+    document.getElementById("categoryModal").classList.add("hidden");
+}
+
+function setCategory(name) {
+    document.getElementById("categoryInput").value = name;
+    document.getElementById("categoryBtn").textContent = name;
+    closeCategoryModal();
+}
+
+/* Hide/show custom fields */
+function toggleCustomFields() {
+    const isCustom = document.getElementById("recurrenceSelect").value === "Custom";
+    document.querySelectorAll(".customField").forEach(el => {
+        el.style.display = isCustom ? "block" : "none";
+    });
+}
+toggleCustomFields();
+</script>
+
+</body>
+
+</html>

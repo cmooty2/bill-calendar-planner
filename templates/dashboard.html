@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Overview</title>
+    <link rel="stylesheet" href="/static/global.css">
+
+    <style>
+        /* TAB BUTTONS */
+        .bill-tabs .tab-btn.active {
+            background-color: #4A6CF7;
+            color: white;
+            border-color: #4A6CF7;
+        }
+        .tab-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: #f2f2f7;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 6px;
+        }
+        .tab-btn:hover { background: #e4e4ea; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        #chartDaily {
+            width: 100% !important;
+            max-height: 260px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1 class="page-title pro-title">
+    <span class="emoji">📊</span> Dashboard Overview
+</h1>
+
+<!-- BUTTON ROW -->
+    <div class="pro-button-row">
+    <a class="pro-btn" href="/calendar/{{ today.year }}/{{ today.month }}">📅 Calendar</a>
+    <a class="pro-btn" href="/bills">📘 Bills</a>
+    <a class="pro-btn" href="/paycheck-planner">🧾 Paycheck Planner</a>
+
+    <details class="nav-more">
+        <summary class="pro-btn">⋯ More</summary>
+        <div class="nav-more-panel">
+        <a href="/all_occurrences">📄 All Occurrences</a>
+        <a href="/forecast">📊 Forecast</a>
+        <a href="/extras">📋 Extras List</a>
+        <a href="/add-extra">➕ Add Extra Expense</a>
+        <a href="#" onclick="openQuickAdd(); return false;">➕ Quick Add Bill</a>
+        </div>
+    </details>
+    </div>
+
+
+<!-- ========================== -->
+<!--        NEXT PAYDAY      -->
+<!-- ========================== -->
+<div class="right-panel-wrapper">
+
+    <div class="next-payday-banner">
+        <strong>📅 Next Payday:</strong> {{ next_payday.strftime("%B %d, %Y") }}
+    </div>
+</div>
+
+<!-- ============================================================= -->
+<!--  METRIC CARDS                                                 -->
+<!-- ============================================================= -->
+<div class="pro-metric-grid">
+    <div class="pro-card gradient-blue">
+        <div class="pro-card-title">Total Due This Month</div>
+        <div class="pro-card-value">${{ "%.2f"|format(total_due_month) }}</div>
+    </div>
+    <div class="pro-card gradient-green">
+        <div class="pro-card-title">Paid This Month</div>
+        <div class="pro-card-value">${{ "%.2f"|format(total_paid) }}</div>
+    </div>
+    <div class="pro-card gradient-red">
+        <div class="pro-card-title">Overdue Bills <span class="badge-overdue">{{ overdue|length }}</span></div>
+        <div class="pro-card-value">${{ "%.2f"|format(total_overdue) }}</div>
+    </div>
+    <div class="pro-card gradient-orange metric-upcoming">
+        <div class="pro-card-title">Upcoming Bills</div>
+        <div class="pro-card-subtitle">
+            {{ today.strftime("%b %d") }} → {{ (next_payday - timedelta(days=1)).strftime("%b %d") }}
+        </div>
+        <div class="pro-card-value">${{ "%.2f"|format(total_upcoming_until_next_payday) }}</div>
+    </div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- UPCOMING / OVERDUE TABS                                      -->
+<!-- ============================================================= -->
+<div class="dashboard-section">
+    <h2 class="section-title">📅 Upcoming & Overdue Bills ({{ current_window.start.strftime("%B %d") }} → {{ (current_window.end - timedelta(days=1)).strftime("%B %d") }})</h2>
+
+    <div class="bill-tabs">
+        <button class="tab-btn active" onclick="showTab('upcomingTab', this)">Upcoming</button>
+        <button class="tab-btn" onclick="showTab('overdueTab', this)">
+            Overdue <span class="badge-overdue small">{{ overdue|length }}</span>
+        </button>
+    </div>
+
+
+<!-- UPCOMING (Paycheck Window) -->
+<div id="upcomingTab" class="tab-content active">
+
+    {# ------------------------------------------------------------------
+        show what "Upcoming" actually means (paycheck window).
+    ------------------------------------------------------------------ #}
+
+    {% if upcoming %}
+        <div class="dashboard-cards">
+            {% for occ in upcoming %}
+            <div class="dash-bill-card dashboard-hide-card-wrap">
+                <form method="POST"
+                        action="/dashboard/hide-occurrence/{{ occ.id }}"
+                        class="dashboard-hide-form">
+                    <button type="submit"
+                            class="dashboard-hide-btn"
+                            title="Remove this card from Dashboard Overview"
+                            aria-label="Remove this card from Dashboard Overview">
+                        ×
+                    </button>
+                </form>
+
+                <div class="bill-header">
+                    <div class="bill-pill cat-{{ occ.bill.category|replace('/', '')|replace(' ', '') }}">
+                        <span class="pill-icon">{{ category_icons.get(occ.bill.category, "🧾") }}</span>
+                        <span class="pill-text">{{ occ.bill.category }}</span>
+                    </div>
+                </div>
+
+                    <div class="bill-main">
+
+                        <!-- BILL NAME + AUTOPAY ROW -->
+                        <div class="bill-top-row">
+                            <div class="bill-name">{{ occ.bill.name }}</div>
+
+                            <div class="bill-autopay {% if occ.bill.auto_pay %}autopay-true{% else %}autopay-false{% endif %}">
+                                {% if occ.bill.auto_pay %}
+                                    🔁 AutoPay
+                                {% else %}
+                                    ❌ Manual Pay
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="bill-detail">📅 {{ occ.due_date.strftime("%b %d") }}</div>
+                        <div class="bill-detail">$ {{ "%.2f"|format(occ.bill.amount) }}</div>
+                    </div>
+
+                    <div class="bill-actions">
+                        <a class="mark-paid-btn small" href="/mark-paid/{{ occ.id }}">Mark Paid</a>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-message">🎉 No upcoming bills in this paycheck window!</p>
+    {% endif %}
+</div>
+
+
+
+    <!-- OVERDUE -->
+<div id="overdueTab" class="tab-content">
+    {% if overdue %}
+        <div class="dashboard-cards">
+            {% for occ in overdue %}
+            <div class="dash-bill-card overdue-card dashboard-hide-card-wrap">
+                <form method="POST"
+                    action="/dashboard/hide-occurrence/{{ occ.id }}"
+                    class="dashboard-hide-form">
+                    <button type="submit"
+                            class="dashboard-hide-btn"
+                            title="Remove this card from Dashboard Overview"
+                            aria-label="Remove this card from Dashboard Overview">
+                        ×
+                    </button>
+                </form>
+
+                    <div class="bill-header">
+                        <div class="bill-pill cat-{{ occ.bill.category|replace('/', '')|replace(' ', '') }}">
+                            <span class="pill-icon">{{ category_icons.get(occ.bill.category, "🧾") }}</span>
+                            <span class="pill-text">{{ occ.bill.category }}</span>
+                        </div>
+                    </div>
+
+                    <div class="bill-main">
+
+                        <!-- BILL NAME + AUTOPAY ROW -->
+                        <div class="bill-top-row">
+                            <div class="bill-name">{{ occ.bill.name }}</div>
+
+                            <div class="bill-autopay {% if occ.bill.auto_pay %}autopay-true{% else %}autopay-false{% endif %}">
+                                {% if occ.bill.auto_pay %}
+                                    🔁 AutoPay
+                                {% else %}
+                                    ❌ Manual Pay
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="bill-detail">📅 {{ occ.due_date.strftime("%b %d") }}</div>
+                        <div class="bill-detail">$ {{ "%.2f"|format(occ.bill.amount) }}</div>
+                    </div>
+
+                    <div class="bill-actions">
+                        <a class="mark-paid-btn small" href="/mark-paid/{{ occ.id }}">Mark Paid</a>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-message">✔️ No overdue bills.</p>
+    {% endif %}
+</div>
+
+<!-- Soft divider between Upcoming and Paycheck Window -->
+<div class="dashboard-soft-divider">
+    <span>Bills for Current Pay Period</span>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- PAYCHECK WINDOW TABLE                                         -->
+<!-- ============================================================= -->
+<div class="dashboard-section paycheck-section">
+
+    <h2 class="section-title">
+        🧾 Current Paycheck Window
+        ({{ current_window.start.strftime("%b %d") }} → {{ (current_window.end - timedelta(days=1)).strftime("%b %d") }})
+    </h2>
+
+    <table class="pro-table paycheck-table">
+        <thead>
+            <tr>
+                <th>Bill Name</th>
+                <th>Due Date</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>AutoPay</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for occ in current_window.bills %}
+            <tr>
+                <td>{{ occ.bill.name }}</td>
+                <td>{{ occ.due_date.strftime("%B %d") }}</td>
+                <td>{{ occ.bill.category }}</td>
+                <td>${{ "%.2f"|format(occ.bill.amount) }}</td>
+                <td>{{ occ.status }}</td>
+                <td>
+                    {% if occ.bill.auto_pay %}
+                        <span class="autopay-yes">🔁</span>
+                    {% else %}
+                        <span class="autopay-no">✖</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+        <tfoot>
+            <tr class="summary-row">
+                <td><strong>Total Bills:</strong> {{ current_window.total_count }}</td>
+                <td></td><td></td>
+                <td class="amount-footer">
+                    <strong>Total Amount:</strong><br>${{ "%.2f"|format(current_window.total_amount) }}
+                </td>
+                <td class="status-footer">
+                    <strong>{{ current_window.paid_count }} Paid</strong><br>
+                    <strong>{{ current_window.unpaid_count }} Unpaid</strong>
+                </td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+</div>
+
+
+<!-- ============================================================= -->
+<!-- UPCOMING PAYCHECKS (Next 2 Cycles)                            -->
+<!-- ============================================================= -->
+<div class="dashboard-section paycheck-section">
+
+    <h2 class="section-title">🧾 Upcoming Paychecks (Next 2 Cycles)</h2>
+
+    {% for idx in [1,2] %}
+        <div class="accordion-header" onclick="toggleAccordion({{ idx }})">
+            <span>
+                <strong>{{ two_paychecks['pay' ~ idx ~ '_date'].strftime("%B %d, %Y") }}</strong><br>
+                Bills: {{ two_paychecks['pay' ~ idx ~ '_bills']|length }} |
+                Total: ${{ "%.2f"|format(two_paychecks['pay' ~ idx ~ '_total']) }}<br>
+                Window:
+                {{ two_paychecks['pay' ~ idx ~ '_window_start'].strftime("%b %d") }}
+                → {{ two_paychecks['pay' ~ idx ~ '_window_end'].strftime("%b %d") }}
+            </span>
+            <span id="arrow-{{ idx }}" class="accordion-arrow">▼</span>
+        </div>
+
+        <div id="body-{{ idx }}" class="accordion-content" style="display:none;">
+            {% set bills_list = two_paychecks['pay' ~ idx ~ '_bills'] %}
+            {% if bills_list %}
+            <div class="paycheck-table-wrapper">
+                <table class="paycheck-table">
+                    <thead>
+                        <tr>
+                            <th>Bill Name</th>
+                            <th>Due Date</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>AutoPay</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for occ in bills_list %}
+                        <tr>
+                            <td>{{ occ.bill.name }}</td>
+                            <td>{{ occ.due_date.strftime("%B %d") }}</td>
+                            <td>{{ occ.bill.category }}</td>
+                            <td>${{ "%.2f"|format(occ.bill.amount) }}</td>
+                            <td>{{ occ.status }}</td>
+                            <td>
+                                {% if occ.bill.auto_pay %}
+                                    <span class="autopay-yes">🔁</span>
+                                {% else %}
+                                    <span class="autopay-no">✖</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="empty-message">No bills in this paycheck window.</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+</div>
+
+
+<!-- ============================================================= -->
+<!-- QUICK ADD BILL MODAL                                          -->
+<!-- ============================================================= -->
+<div id="quickAddModal" class="modal-overlay hidden">
+    <div class="modal-box quick-add-box">
+
+        <h2 class="modal-title">➕ Quick Add Bill</h2>
+
+        <form method="POST" action="/add-bill">
+
+            <div class="form-field">
+                <label>📝 Bill Name</label>
+                <input type="text" name="name" required>
+            </div>
+
+            <div class="form-field">
+                <label>💵 Amount Due</label>
+                <input type="number" step="0.01" name="amount" required>
+            </div>
+
+            <div class="form-field">
+                <label>📂 Category</label>
+                <input type="hidden" name="category" id="quickCategory">
+                <button type="button" class="pro-btn" onclick="openCategoryModal()">Choose Category</button>
+            </div>
+
+            <div class="form-field">
+                <label>🔁 Recurrence</label>
+                <select id="quickRecurrence" name="recurrence"
+                        onchange="toggleQuickCustomFields()" required>
+                    <option>One-Time</option>
+                    <option>Weekly</option>
+                    <option>Biweekly</option>
+                    <option>Monthly</option>
+                    <option>Quarterly</option>
+                    <option>Yearly</option>
+                    <option>Custom</option>
+                </select>
+            </div>
+
+            <div id="quickCustomBox" class="form-row hidden">
+                <div class="form-field">
+                    <label>🔧 Custom Interval</label>
+                    <input type="number" name="custom_interval" min="1">
+                </div>
+                <div class="form-field">
+                    <label>📏 Interval Unit</label>
+                    <select name="custom_unit">
+                        <option value="days">Days</option>
+                        <option value="weeks">Weeks</option>
+                        <option value="months">Months</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="quickEndAfter" class="form-row hidden">
+                <div class="form-field">
+                    <label>🛑 Stop After # Occurrences</label>
+                    <input type="number" name="end_after_occurrences" min="1">
+                </div>
+            </div>
+
+            <div class="form-field">
+                <label>📅 First Due</label>
+                <input type="date" name="first_due" required>
+            </div>
+
+            <div class="form-field">
+                <label>📅 End Date (optional)</label>
+                <input type="date" name="end_date">
+            </div>
+
+            <div class="form-field">
+                <label>⚙ Auto Pay?</label>
+                <select name="auto_pay">
+                    <option value="False">No</option>
+                    <option value="True">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-field-large">
+                <label>🗒 Notes</label>
+                <textarea name="notes" rows="3"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button class="pro-btn">💾 Save</button>
+                <button type="button" class="pro-btn cancel-btn"
+                        onclick="closeQuickAdd()">Cancel</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- CATEGORY PICKER -->
+<div id="categoryModal" class="modal-overlay hidden">
+    <div class="modal-box">
+        <h3>Select a Category</h3>
+
+        <input type="text" id="categorySearch" class="category-search"
+               placeholder="Search categories..." oninput="filterCategories()">
+
+        <div class="category-group">
+            <h4 class="category-group-title">💳 Financial</h4>
+            <ul>
+                <li onclick="selectQuickCategory('Credit Cards')">Credit Cards</li>
+                <li onclick="selectQuickCategory('Installment Loans')">Installment Loans</li>
+                <li onclick="selectQuickCategory('Loans')">Loans</li>
+            </ul>
+        </div>
+
+        <div class="category-group">
+            <h4 class="category-group-title">🏡 Home</h4>
+            <ul>
+                <li onclick="selectQuickCategory('Rent/Mortgage')">Rent/Mortgage</li>
+                <li onclick="selectQuickCategory('Utilities')">Utilities</li>
+                <li onclick="selectQuickCategory('Home Expenses')">Home Expenses</li>
+            </ul>
+        </div>
+
+        <div class="category-group">
+            <h4 class="category-group-title">🚗 Auto</h4>
+            <ul>
+                <li onclick="selectQuickCategory('Insurance')">Insurance</li>
+                <li onclick="selectQuickCategory('Auto Services')">Auto Services</li>
+            </ul>
+        </div>
+
+        <div class="category-group">
+            <h4 class="category-group-title">📱 Subscriptions</h4>
+            <ul>
+                <li onclick="selectQuickCategory('Subscriptions')">General Subscriptions</li>
+            </ul>
+        </div>
+
+        <div class="category-group">
+            <h4 class="category-group-title">📦 Misc</h4>
+            <h4 class="category-group-title">🏛️ Taxes</h4>
+            <ul>
+                <li onclick="selectQuickCategory('Misc')">Misc</li>
+            </ul>
+        </div>
+
+        <button class="pro-btn cancel-btn" onclick="closeCategoryModal()">Close</button>
+    </div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- JAVASCRIPT (Final, Cleaned, Single-Version)                    -->
+<!-- ============================================================= -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+/* =============================== */
+/*  PAYCHECK PLANNER ACCORDION     */
+/* =============================== */
+function togglePaycheckAccordion(event) {
+    const body = document.getElementById("paycheck-accordion");
+    const arrow = document.getElementById("accordion-arrow");
+    const header = event.currentTarget;
+
+    body.classList.toggle("open");
+    header.classList.toggle("open");
+    arrow.textContent = body.classList.contains("open") ? "▲" : "▼";
+}
+
+/* SMALL ACCORDIONS (Upcoming Paychecks) */
+function toggleAccordion(i) {
+    const body = document.getElementById("body-" + i);
+    const arrow = document.getElementById("arrow-" + i);
+
+    if (body.style.display === "block") {
+        body.style.display = "none";
+        arrow.textContent = "▼";
+    } else {
+        body.style.display = "block";
+        arrow.textContent = "▲";
+    }
+}
+
+/* QUICK ADD */
+function openQuickAdd() {
+    document.getElementById("quickAddModal").classList.remove("hidden");
+}
+function closeQuickAdd() {
+    document.getElementById("quickAddModal").classList.add("hidden");
+}
+
+/* CATEGORY MODAL */
+function openCategoryModal() {
+    document.getElementById("categoryModal").classList.remove("hidden");
+}
+function closeCategoryModal() {
+    document.getElementById("categoryModal").classList.add("hidden");
+}
+function selectQuickCategory(value) {
+    document.getElementById("quickCategory").value = value;
+    closeCategoryModal();
+}
+function filterCategories() {
+    const v = document.getElementById("categorySearch").value.toLowerCase();
+    document.querySelectorAll(".category-group ul li").forEach(li => {
+        li.style.display = li.innerText.toLowerCase().includes(v) ? "block" : "none";
+    });
+}
+
+/* TAB SWITCHING */
+function showTab(tabId, btn) {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+    document.getElementById(tabId).classList.add("active");
+}
+
+/* ========================================================== */
+/*          CHART DATA FROM PYTHON                            */
+/* ========================================================== */
+const paidCount = {{ current_window.paid_count }};
+const unpaidCount = {{ current_window.unpaid_count }};
+
+const categoryTotals = {};
+{% for occ in current_window.bills %}
+    categoryTotals["{{ occ.bill.category }}"] =
+        (categoryTotals["{{ occ.bill.category }}"] || 0) + {{ occ.bill.amount }};
+{% endfor %}
+
+const catLabels = Object.keys(categoryTotals);
+const catValues = Object.values(categoryTotals);
+
+const dailyLabels = [
+    {% for day in current_window.daily_totals %}
+        "{{ day.date.strftime('%b %d') }}",
+    {% endfor %}
+];
+
+const dailyAmounts = [
+    {% for day in current_window.daily_totals %}
+        {{ day.amount }},
+    {% endfor %}
+];
+
+/* ========================================================== */
+/*          RENDER CHARTS                                     */
+/* ========================================================== */
+
+/* CATEGORY PIE */
+new Chart(document.getElementById("chartCategories"), {
+    type: "pie",
+    data: {
+        labels: catLabels,
+        datasets: [{
+            data: catValues,
+            backgroundColor: ["#3D52A0","#4CAF50","#FF9800","#E53935","#9C27B0","#03A9F4"]
+        }]
+    },
+    options: { plugins: { legend: { position: "bottom" } } }
+});
+
+/* PAID VS UNPAID */
+new Chart(document.getElementById("chartPaidStatus"), {
+    type: "doughnut",
+    data: {
+        labels: ["Paid", "Unpaid"],
+        datasets: [{
+            data: [paidCount, unpaidCount],
+            backgroundColor: ["#4CAF50", "#E53935"]
+        }]
+    },
+    options: { plugins: { legend: { position: "bottom" } } }
+});
+
+/* DAILY SPENDING BAR */
+new Chart(document.getElementById("chartDaily"), {
+    type: "bar",
+    data: {
+        labels: dailyLabels,
+        datasets: [{
+            label: "Daily Spending",
+            data: dailyAmounts,
+            backgroundColor: "#3D52A0"
+        }]
+    },
+    options: {
+        scales: { y: { beginAtZero: true } },
+        plugins: { legend: { display: false } }
+    }
+});
+</script>
+
+</body>
+</html>

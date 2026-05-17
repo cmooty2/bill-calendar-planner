@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Bill Occurrences</title>
+    <link rel="stylesheet" href="/static/global.css">
+</head>
+
+<body>
+
+    <div class="sticky-occ-header">
+        <h1 class="page-title">
+            <span class="emoji">📄</span> All Bill Occurrences
+        </h1>
+    
+        <div class="pro-button-row">
+            <a class="pro-btn" href="/dashboard">🏠 Home</a>
+            <a class="pro-btn" href="/bills">📘 Bills</a>
+        </div>
+    
+        <!-- SEARCH + CATEGORY FILTER -->
+        <div class="filter-bar">
+            <input id="occSearchInput" type="text" class="search-input"
+                    placeholder="Search occurrences by name, category, or status...">
+    
+            <select id="occCategoryFilter" class="category-filter">
+                <option value="">All Categories</option>
+                {% for c in categories %}
+                <option value="{{ c }}">{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    
+
+<!-- All Occurrences Bills Table -->
+<div class="page-container">
+    <table class="pro-table" id="occTable">
+        <thead>
+            <tr>
+                <th>Bill Name</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Overdue?</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for occ in occurrences %}
+            <tr class="{% if occ.is_overdue %}row-overdue{% endif %}">
+                <td>{{ occ.bill.name }}</td>
+                <td>${{ "%.2f"|format(occ.bill.amount) }}</td>
+                <td>{{ occ.bill.category }}</td>
+
+                <td class="nowrap">{{ occ.due_date.strftime("%m-%d-%Y") }}</td>
+
+                <td>{{ occ.status }}</td>
+
+                <td>{% if occ.is_overdue %}❌ Yes{% else %}✅ No{% endif %}</td>
+
+                <td>
+                    {% if occ.status != "Paid" %}
+                        <a class="pro-action-btn" href="/mark-paid/{{ occ.id }}">💰 Mark Paid</a>
+                    {% else %}
+                        <a class="pro-action-btn warning-btn" href="/mark-unpaid/{{ occ.id }}">↩ Mark Unpaid</a>
+                    {% endif %}
+                </td>
+
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    /* ===============================
+        SEARCH FILTER – real-time
+    =============================== */
+    document.getElementById("occSearchInput").addEventListener("keyup", function () {
+        const val = this.value.toLowerCase();
+        const rows = document.querySelectorAll("#occTable tbody tr");
+    
+        rows.forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
+        });
+    });
+    
+    /* ===============================
+        CATEGORY FILTER
+    =============================== */
+    document.getElementById("occCategoryFilter").addEventListener("change", function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll("#occTable tbody tr");
+    
+        rows.forEach(row => {
+            const category = row.children[2].innerText.toLowerCase();
+            row.style.display = (!filter || category === filter) ? "" : "none";
+        });
+    });
+
+    document.addEventListener("scroll", function () {
+        const headerCells = document.querySelectorAll(".pro-table thead th");
+    
+        if (window.scrollY > 160) {
+            headerCells.forEach(th => th.classList.add("scrolled"));
+        } else {
+            headerCells.forEach(th => th.classList.remove("scrolled"));
+        }
+    });
+    </script>
+    
+</body>
+</html>

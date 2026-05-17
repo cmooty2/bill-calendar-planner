@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Bills</title>
+    <link rel="stylesheet" href="/static/global.css">
+</head>
+
+<body class="bills-page">
+
+<div class="sticky-bills-header">    
+    <h1 class="page-title">
+        <span class="emoji">📘</span> Manage Bills
+    </h1>
+
+    <div class="pro-button-row">
+        <a class="pro-btn" href="/dashboard">🏠 Home</a>
+        <a class="pro-btn" href="/calendar/{{ today.year }}/{{ today.month }}">📅 Calendar</a>
+        <a class="pro-btn" href="/add-bill">➕ Add Bill</a>
+
+        <details class="nav-more">
+            <summary class="pro-btn">⋯ More</summary>
+            <div class="nav-more-panel">
+                <a href="/paycheck-planner">🧾 Paycheck Planner</a>
+                <a href="/all_occurrences">📄 All Occurrences</a>
+                <a href="/add-extra">➕ Add Extra Expense</a>
+                <a href="/extras">📋 Extras List</a>
+            </div>
+        </details>
+        
+    </div>
+
+    <!-- SEARCH + CATEGORY FILTER -->
+    <div class="filter-bar">
+        <input id="searchInput" type="text" class="search-input"
+            placeholder="Search bills by name, category, or notes...">
+
+        <select id="categoryFilter" class="category-filter">
+            <option value="">All Categories</option>
+            {% for c in categories %}
+            <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div> 
+
+<div class="page-container">
+    <div class="table-responsive">
+
+        <table class="pro-table" id="billsTable">
+
+            <thead>
+                <tr>
+                    <th class="sortable col-billname">Bill Name</th>
+                    <th class="sortable col-amount">Amount</th>
+                    <th class="sortable col-category">Category</th>
+                    <th class="sortable col-recurrence">Recurrence</th>
+                    <th class="sortable nowrap col-firstdue">First Due</th>
+                    <th class="sortable col-autopay">Auto Pay</th>
+                    <th class="sortable nowrap col-enddate">End Date</th>
+                    <th class="col-notes">Notes</th>
+                    <th class="action-cell col-actions">Actions</th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for bill in bills %}
+                <tr>
+
+                    <td class="billname-cell" title="{{ bill.name }}">{{ bill.name }}</td>
+                    <td class="amount-cell money">${{ "%.2f"|format(bill.amount) }}</td>
+
+
+                    <!-- CATEGORY COLOR TAG -->
+                    <td>
+                        <span class="category-pill-table cat-{{ bill.category|replace('/', '')|replace(' ', '') }}">
+                            {{ bill.category }}
+                        </span>
+                    </td>
+
+                    <td>{{ bill.recurrence }}</td>
+
+                    <td class="nowrap">{{ bill.first_due.strftime("%m-%d-%Y") }}</td>
+
+                    <!-- AUTOPAY -->
+                    <td>
+                        {% if bill.auto_pay %}
+                            <span class="autopay-yes">✔ Yes</span>
+                        {% else %}
+                            <span class="autopay-no">✘ No</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- END DATE -->
+                    <td class="nowrap">
+                        {% if bill.end_date %}
+                            {{ bill.end_date.strftime("%m-%d-%Y") }}
+                        {% else %} — {% endif %}
+                    </td>
+
+                    <td>{{ bill.notes if bill.notes else "—" }}</td>
+
+                    <!-- STICKY ACTION COLUMN -->
+                    <td class="action-cell">
+                        <div class="action-buttons">
+                            <a class="edit-btn" href="/edit-bill/{{ bill.id }}">✏️ Edit</a>
+                    
+                            <form method="POST" action="/delete-bill/{{ bill.id }}"
+                                  onsubmit="return confirm('Delete this bill?')">
+                                <button class="delete-btn">🗑 Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                    
+
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+
+
+<script>
+/* ===============================
+   SEARCH FILTER – real-time
+=============================== */
+document.getElementById("searchInput").addEventListener("keyup", function () {
+    const val = this.value.toLowerCase();
+    const rows = document.querySelectorAll("#billsTable tbody tr");
+
+    rows.forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
+    });
+});
+
+/* ===============================
+   CATEGORY FILTER
+=============================== */
+document.getElementById("categoryFilter").addEventListener("change", function () {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll("#billsTable tbody tr");
+
+    rows.forEach(row => {
+        const category = row.children[2].innerText.toLowerCase();
+        row.style.display = (!filter || category === filter) ? "" : "none";
+    });
+});
+
+/* ===============================
+   SORTABLE COLUMNS
+=============================== */
+document.querySelectorAll(".sortable").forEach((header, index) => {
+    header.addEventListener("click", () => sortTable(index));
+});
+
+function sortTable(index) {
+    const table = document.getElementById("billsTable");
+    let rows = Array.from(table.rows).slice(1);
+    const asc = table.getAttribute("data-sort") !== "asc";
+
+    rows.sort((a, b) => {
+        const A = a.cells[index].innerText.trim();
+        const B = b.cells[index].innerText.trim();
+
+        const numA = parseFloat(A.replace(/[^0-9.-]+/g,""));
+        const numB = parseFloat(B.replace(/[^0-9.-]+/g,""));
+
+        if (!isNaN(numA) && !isNaN(numB)) return asc ? numA - numB : numB - numA;
+        return asc ? A.localeCompare(B) : B.localeCompare(A);
+    });
+
+    rows.forEach(r => table.tBodies[0].appendChild(r));
+    table.setAttribute("data-sort", asc ? "asc" : "desc");
+}
+
+    document.addEventListener("scroll", function () {
+        const headerCells = document.querySelectorAll(".pro-table thead th");
+    
+        if (window.scrollY > 160) {
+            headerCells.forEach(th => th.classList.add("scrolled"));
+        } else {
+            headerCells.forEach(th => th.classList.remove("scrolled"));
+        }
+    });
+ 
+</script>
+
+</body>
+</html>
