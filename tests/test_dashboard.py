@@ -1,3 +1,7 @@
+# ============================================================
+#  TEST DASHBOARD PAGE LOADS
+# ============================================================
+
 from playwright.sync_api import Page, expect
 from config import BASE_URL
 import re
