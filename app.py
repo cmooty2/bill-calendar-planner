@@ -614,7 +614,9 @@ def add_bill():
         db.session.commit()
 
         generate_occurrences(bill)
-        return redirect(url_for("dashboard"))
+
+        flash("Bill Added Successfully", "success")
+        return redirect(url_for("add_bill"))
 
     return render_template("edit_bill.html", bill=None)
 

@@ -14,19 +14,45 @@
 
     <div class="form-container-pro">
 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         <form method="POST" class="pro-form-card two-column-form">
 
             <!-- BILL NAME -->
             <div class="form-field">
-                <label>📝 Bill Name</label>
-                <input type="text" name="name" required value="{{ bill.name if bill else '' }}">
+                <label for="billName">📝 Bill Name</label>
+
+                <input
+                    id="billName"
+                    type="text"
+                    name="name"
+                    required
+                    value="{{ bill.name if bill else '' }}"
+                >
             </div>
 
             <!-- AMOUNT -->
             <div class="form-field">
-                <label>💵 Amount Due</label>
-                <input type="number" step="0.01" name="amount" required 
-                       value="{{ bill.amount if bill else '' }}">
+
+                <label for="amountDue">💵 Amount Due</label>
+
+                <input
+                    id="amountDue"
+                    type="number"
+                    step="0.01"
+                    name="amount"
+                    required
+                    value="{{ bill.amount if bill else '' }}"
+                >
+
             </div>
 
             <!-- CATEGORY BUTTON -->
